@@ -1,0 +1,29 @@
+node_modules/
+.expo/
+dist/
+android/
+ios/
+web-build/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Vendor / tooling metadata not part of project source.
+.vscode/
+.pi/
+.trae/
+.codex/
+.opencode/
+.claude/
+.atl/
+
+# Generated / vendored assets.
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.svg
+*.ttf
+*.otf
