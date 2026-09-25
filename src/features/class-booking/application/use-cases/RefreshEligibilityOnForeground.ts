@@ -18,7 +18,7 @@ export interface RefreshEligibilityResult {
 export class RefreshEligibilityOnForeground {
   constructor(private readonly deps: RefreshEligibilityDeps) {}
 
-  async execute(): Promise<RefreshEligibilityResult> {
+  execute(): RefreshEligibilityResult {
     const snapshot = this.deps.store.getSnapshot();
     if (!snapshot) {
       return { cancellableBookingIds: [], sessionsHidden: [] };
