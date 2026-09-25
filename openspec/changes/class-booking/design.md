@@ -36,11 +36,11 @@ Alternative considered: a global `src/shared/booking` tree. Rejected because it 
 
 ### Three ports, three adapters, no fourth
 
-| Port | Contract | Production adapter | Test double |
-|------|----------|--------------------|-------------|
-| `BookingRepository` | `load(): Promise<SnapshotDTO \| null>` / `save(snapshot: SnapshotDTO): Promise<void>` with schema-version awareness and recoverable errors | `AsyncStorageBookingRepository` | `InMemoryBookingRepository` (fault-injectable) |
-| `BookingStateStore` | Synchronous `getSnapshot()` / `replaceSnapshot(snapshot)` / `subscribe(listener)` returning an unsubscribe; snapshot is immutable | `ZustandBookingStateAdapter` (vanilla store internally) | `InMemoryBookingStateAdapter` |
-| `Clock` | `now(): Date` returning the current instant | `SystemClock` | `FixedClock` |
+| Port                | Contract                                                                                                                                   | Production adapter                                      | Test double                                    |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------- |
+| `BookingRepository` | `load(): Promise<SnapshotDTO \| null>` / `save(snapshot: SnapshotDTO): Promise<void>` with schema-version awareness and recoverable errors | `AsyncStorageBookingRepository`                         | `InMemoryBookingRepository` (fault-injectable) |
+| `BookingStateStore` | Synchronous `getSnapshot()` / `replaceSnapshot(snapshot)` / `subscribe(listener)` returning an unsubscribe; snapshot is immutable          | `ZustandBookingStateAdapter` (vanilla store internally) | `InMemoryBookingStateAdapter`                  |
+| `Clock`             | `now(): Date` returning the current instant                                                                                                | `SystemClock`                                           | `FixedClock`                                   |
 
 Alternative considered: using the Zustand persist middleware instead of a custom `BookingRepository`. Rejected because it couples hydration to the store and prevents the spec requirement that hydration finish before any command is exposed. The split keeps state and persistence replaceable independently.
 
