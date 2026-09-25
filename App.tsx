@@ -1,20 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { CompositionProvider } from '@features/class-booking/compositionProvider';
+import { buildProductionComposition, type Composition } from '@features/class-booking/composition';
+import { RootTabs } from './src/navigation/RootTabs';
+import { ActivityIndicator, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
+  const [composition, setComposition] = useState<Composition | null>(null);
+
+  useEffect(() => {
+    const instance = buildProductionComposition({ storage: AsyncStorage });
+    void (async () => {
+      try {
+        await instance.initializeBookings.execute();
+      } finally {
+        setComposition(instance);
+      }
+    })();
+  }, []);
+
+  if (!composition) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <CompositionProvider composition={composition}>
+      <RootTabs />
+    </CompositionProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
