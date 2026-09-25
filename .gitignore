@@ -1,0 +1,80 @@
+# ─────────────────────────────────────────────────────────────────
+# AI tooling (excluded — noise, not part of the project)
+# ─────────────────────────────────────────────────────────────────
+.atl/
+/.claude/
+/.codex/
+/.opencode/
+/.pi/
+/.trae/
+
+# ─────────────────────────────────────────────────────────────────
+# macOS
+# ─────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# ─────────────────────────────────────────────────────────────────
+# Node / package managers
+# ─────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ─────────────────────────────────────────────────────────────────
+# Expo / React Native / EAS
+# ─────────────────────────────────────────────────────────────────
+.expo/
+.expo-shared/
+dist/
+web-build/
+*.tsbuildinfo
+metro-cache/
+
+# Native build artifacts
+ios/Pods/
+ios/build/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.xcworkspace/xcuserdata
+*.xcodeproj/xcuserdata
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# Signing / keystores (NEVER commit)
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# ─────────────────────────────────────────────────────────────────
+# Env / secrets (NEVER commit)
+# ─────────────────────────────────────────────────────────────────
+.env
+.env.*.local
+.env.local
+
+# ─────────────────────────────────────────────────────────────────
+# Test / coverage
+# ─────────────────────────────────────────────────────────────────
+coverage/
+*.lcov
+
+# ─────────────────────────────────────────────────────────────────
+# IDE
+# ─────────────────────────────────────────────────────────────────
+.idea/
+*.swp
+*.swo
+.vscode/          # tracked manually if you want shared settings

@@ -1,0 +1,199 @@
+schema: spec-driven
+
+# Persistent project context — shown to the AI on every creation.
+context: |
+  # ClaseFit — mobile MVP for gym class reservations (Medellín).
+  Actor: Laura Gómez (S-0001). Product: browse upcoming classes, reserve, cancel.
+  Stack: Expo, React Native, TypeScript strict, Jest, React Native Testing Library,
+         React Navigation, Zustand, AsyncStorage, EAS.
+  Source of truth (authoritative over any assumption):
+    - PRD:   tasks/prd-clasefit.md
+    - RFCs:  docs/rfcs/001-foundation.md … 005-evidence-and-handoff.md
+    - Visual design: docs/design/DESIGN.md
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Architecture: feature-first + Ports & Adapters (Hexagonal).
+  # ───────────────────────────────────────────────────────────────────────
+  Single feature structure: src/features/class-booking/{domain, application,
+                                                          infrastructure, presentation}.
+  Subfolders per layer:
+    domain:        entities, policies, states, services, errors
+    application:   use-cases, ports, queries, dto
+    infrastructure: persistence, state, time, fixtures, mappers
+    presentation:  screens, components, hooks, copy
+
+  Dependency rule (strict, no inversion):
+    presentation → application → domain
+    infrastructure implements ports defined in application/ports; may depend on domain
+    shared/ui does NOT import features
+    ONLY composition.ts knows concrete implementations (composition root)
+
+  # ───────────────────────────────────────────────────────────────────────
+  # OOP — encapsulation, NO passive DTOs.
+  # ───────────────────────────────────────────────────────────────────────
+  Patterns per layer (RFC-002):
+    domain:
+      - Entity + encapsulation: Reservation validates transitions;
+        ClassSession protects capacity/date invariants.
+      - Strategy: CapacityRule, DuplicateRule, DailyLimitRule → BookingRule contract.
+      - Business State: ActiveReservation allows cancellation;
+        CancelledReservation is terminal (rejects further transitions).
+      - errors/: typed codes — no loose strings in use cases.
+    application:
+      - Use cases named with imperative verb:
+        InitializeBookings, BookClass, CancelBooking.
+      - ports/: BookingRepository, BookingStateStore, Clock
+        (explicit contracts, not generic interfaces).
+      - dto/: immutable, serializable, versioned, no methods.
+      - queries/: read-only — upcoming classes and active bookings.
+      - Constructor injection (no DI container, no service locator).
+    infrastructure:
+      - Named adapters: AsyncStorageBookingRepository,
+        ZustandBookingStateAdapter, SystemClock.
+      - Test substitutes: InMemory* with fault injection, FixedClock.
+    presentation:
+      - React functional components (NEVER classes).
+      - Containers vs Presentational separated.
+      - Hooks ONLY subscribe to the store and delegate to use cases.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Business logic: NEVER in components, ONLY in domain/application.
+  # ───────────────────────────────────────────────────────────────────────
+  Presentation components and hooks:
+    - Receive immutable DTOs from queries.
+    - Call use cases — do not mutate state directly.
+    - Render. Do not validate. Do not compute availability. Do not count spots.
+  If a validation, calculation, or mutation lives in a presentation component
+  or hook → MOVE to domain/policies or application/use-cases.
+  Domain and application tests run WITHOUT React, Zustand, or device storage.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Compound Components — when and how.
+  # ───────────────────────────────────────────────────────────────────────
+  Use Compound Components when a widget has multiple parts with shared state
+  or context
+  (Card + Card.Header + Card.Body,
+   CancellationSheet + CancellationSheet.Title + CancellationSheet.Actions,
+   Tabs + Tabs.List + Tabs.Trigger + Tabs.Panel).
+  Do NOT use for simple primitives (Button, Input, Text).
+  Rules:
+    - Shared state encapsulated in internal Context of the compound.
+    - Composition API (children), NOT by proliferating boolean props
+      (isLoading, isDisabled, hasIcon, hasFooter).
+    - Name subcomponents as static property of the parent
+      (Card.Header, Card.Body) or export them individually.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Imports — no barrels.
+  # ───────────────────────────────────────────────────────────────────────
+  ALWAYS import by concrete path:
+    OK   import { BookClass } from '@features/class-booking/application/use-cases/BookClass'
+    OK   import { PrimaryButton } from '@shared/ui/components/PrimaryButton'
+    NO   import { BookClass } from '@features/class-booking'           # barrel forbidden
+    NO   import { PrimaryButton } from '@shared/ui/components'         # barrel forbidden
+  Single public door of the feature: composition.ts (wired constructor).
+  FORBIDDEN re-exporting index.ts in src/ and shared/ui/.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # TDD: RED → GREEN → REFACTOR per task.
+  # ───────────────────────────────────────────────────────────────────────
+  Every new behavior: write red test → implement minimum → refactor.
+  Do not mark a task complete without the visible cycle in commits.
+  Domain and application tests run without React, Zustand, or device storage.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Ports and blast radius.
+  # ───────────────────────────────────────────────────────────────────────
+  Changing an adapter touches: the adapter + composition.ts. NOTHING ELSE.
+  Changing a business rule (RN-03) touches: domain/policies/<Rule>.ts. ONLY THAT.
+  If a change forces touching more files → there is a contract failure that
+  is solved by redesigning the port, not by adding conditionals.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Exact functional messages (PRD §4) — literal, no paraphrasing.
+  # ───────────────────────────────────────────────────────────────────────
+    RN-01 (capacity):  "Esta clase ya no tiene cupos."
+    RN-02 (duplicate): "Ya reservaste esta clase."
+    RN-03 (daily):     "Solo puedes reservar 2 clases por día."
+    RN-04 (cancel):    "Ya no puedes cancelar: faltan menos de 2 horas."
+    FR-05 (success):   "¡Listo! Tu cupo está reservado"
+    FR-06 (empty):     "Aún no tienes reservas"
+  Deterministic precedence when multiple rules fail: RN-01, then RN-02,
+  then RN-03. Document and test.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Time and timezone.
+  # ───────────────────────────────────────────────────────────────────────
+  Eligibility: real instant (Clock.now()).
+  Presentation and chronological grouping: America/Bogota.
+  Injected Clock: SystemClock in production, FixedClock in tests.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Pessimistic, serialized local persistence.
+  # ───────────────────────────────────────────────────────────────────────
+  Single command queue per feature. Incompatible writes blocked.
+  Do not write default empty state before finishing hydration.
+  Persist: schemaVersion, datasetVersion, baseDateBogota, resolved sessions,
+           bookings with status and timestamps.
+  Session identity = classId + resolved local date (NOT diaOffset).
+  Read/write errors → keep previous data, allow retry.
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Commits and attribution.
+  # ───────────────────────────────────────────────────────────────────────
+  Conventional Commits (feat, fix, chore, docs, refactor, test, perf).
+  FORBIDDEN "Co-Authored-By:" or any AI attribution in commits.
+  One commit per closed task or reviewable logical batch.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Per-artifact rules.
+# ─────────────────────────────────────────────────────────────────────────────
+rules:
+  proposal:
+    - Required sections: Why, What Changes, Impact.
+    - Include Non-goals — what is NOT done in this change.
+    - Keep under 500 words; link PRD/RFC instead of copying.
+    - One screen is NOT an independent bounded context.
+
+  specs:
+    - MUST/SHALL syntax and Given/When/Then scenarios required.
+    - Separate business requirements from UI details.
+    - Each requirement with at least one success and one rejection scenario.
+    - Functional messages literal from PRD §4 — quote as-is.
+    - Traceability: each requirement links to PRD, RN, or FR.
+
+  design:
+    - Document decisions, ports, layer boundaries, alternatives, and risks.
+    - List concrete files to be created or modified (folder/file.ext).
+    - List affected ports (contracts in application/ports and adapters in infrastructure/).
+    - Indicate TDD cycle per task: which red test will be written first.
+    - Link PRD/RFC; do not duplicate content.
+
+  tasks:
+    - Each behavior follows RED → GREEN → REFACTOR before being marked complete.
+    - Concrete file paths; never vague descriptions.
+    - Each task references at least one spec scenario.
+    - Small tasks, independently verifiable.
+    - Suggested order: domain → use cases → adapters → UI → verification.
+    - Suggested limit: ≤ 2 hours of work per task.
+
+  apply:
+    - Do not implement a task without its red test when applicable.
+    - Conventional Commits; "Co-Authored-By" forbidden.
+    - Do not create re-exporting barrel/index.ts in src/ or shared/ui/.
+    - Changing an adapter touches ONLY the adapter + composition.ts.
+    - Components do NOT contain business logic — presentation only.
+    - Use Compound Components when applicable (see context).
+
+  verify:
+    - Run real tests, types, lint, and OpenSpec validation.
+    - Save real CLI output — do not fabricate.
+    - Reconcile evidence with tasks and scenarios one by one.
+    - If a scenario fails → return to its task; do NOT archive.
+    - Visual verification on iOS and Android when applicable to UI.
+
+  archive:
+    - Only archive after successful and complete verify.
+    - Archive does NOT remove traceability: the change is recorded.
+    - Document external blockers explicitly.
+    - Confirm that the current spec reflects the implemented reality.
