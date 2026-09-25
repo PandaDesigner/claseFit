@@ -2,14 +2,14 @@
 
 ## Review Workload Forecast
 
-| Field | Value |
-|-------|-------|
-| Estimated changed lines | 1200–1600 (production + tests + fixtures) |
-| 400-line budget risk | High |
-| Chained PRs recommended | Yes |
-| Suggested split | PR 1: domain + tests · PR 2: application + ports + tests · PR 3: adapters + composition · PR 4: UI screens + navigation |
-| Delivery strategy | ask-on-risk |
-| Chain strategy | feature-branch-chain |
+| Field                   | Value                                                                                                                   |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Estimated changed lines | 1200–1600 (production + tests + fixtures)                                                                               |
+| 400-line budget risk    | High                                                                                                                    |
+| Chained PRs recommended | Yes                                                                                                                     |
+| Suggested split         | PR 1: domain + tests · PR 2: application + ports + tests · PR 3: adapters + composition · PR 4: UI screens + navigation |
+| Delivery strategy       | ask-on-risk                                                                                                             |
+| Chain strategy          | feature-branch-chain                                                                                                    |
 
 Decision needed before apply: Yes
 Chained PRs recommended: Yes
@@ -18,12 +18,12 @@ Chain strategy: feature-branch-chain
 
 ### Suggested Work Units
 
-| Unit | Goal | Likely PR | Notes |
-|------|------|-----------|-------|
-| 1 | OOP domain entities, states, policies, errors, and tests | PR 1 → tracker branch | No React, no Zustand, no AsyncStorage |
-| 2 | Application ports, DTOs, use cases, queries | PR 2 → PR 1 | Constructor injection, no concrete adapters |
-| 3 | AsyncStorage + Zustand + SystemClock adapters + composition root | PR 3 → PR 2 | Adapter-only blast radius |
-| 4 | UI tokens, compound components, hooks, screens, navigation | PR 4 → PR 3 | Presentation-only; subscribes to store |
+| Unit | Goal                                                             | Likely PR             | Notes                                       |
+| ---- | ---------------------------------------------------------------- | --------------------- | ------------------------------------------- |
+| 1    | OOP domain entities, states, policies, errors, and tests         | PR 1 → tracker branch | No React, no Zustand, no AsyncStorage       |
+| 2    | Application ports, DTOs, use cases, queries                      | PR 2 → PR 1           | Constructor injection, no concrete adapters |
+| 3    | AsyncStorage + Zustand + SystemClock adapters + composition root | PR 3 → PR 2           | Adapter-only blast radius                   |
+| 4    | UI tokens, compound components, hooks, screens, navigation       | PR 4 → PR 3           | Presentation-only; subscribes to store      |
 
 ## Phase 1: Domain (RED → GREEN → REFACTOR)
 
