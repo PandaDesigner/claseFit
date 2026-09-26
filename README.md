@@ -10,9 +10,11 @@ Mobile MVP for gym class reservations (Medellín). Actor: Laura Gómez (S-0001).
 
 ```bash
 pnpm install
-pnpm test          # 76 tests across 19 suites (domain/application/presentation)
+pnpm test          # 96 tests across 21 suites (domain/application/infrastructure/presentation)
 pnpm typecheck     # tsc --noEmit
 pnpm lint          # eslint, 0 warnings
+pnpm format:check  # prettier
+pnpm format        # prettier --write
 pnpm start         # Expo dev server (QR + Expo Go)
 pnpm android       # native build on the connected device (uses committed android/)
 pnpm setup:review  # installs the GGA pre-commit hook
@@ -66,18 +68,18 @@ Business logic NEVER lives in components. Validation, capacity math, daily-limit
 
 ## Scripts
 
-| Script | What |
-| ------ | ---- |
-| `pnpm start` | Expo dev server (QR + Expo Go) |
-| `pnpm android` / `pnpm ios` | Native build on the connected device / simulator |
-| `pnpm web` | Web build (same JS bundle) |
-| `pnpm test` | Jest, 19 suites / 76 tests |
-| `pnpm test:watch` | Jest watch mode |
-| `pnpm test:coverage` | Jest with coverage |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm lint` / `pnpm lint:fix` | ESLint, 0 warnings enforced |
-| `pnpm format` / `pnpm format:check` | Prettier |
-| `pnpm setup:review` | Installs the GGA pre-commit hook |
+| Script                              | What                                             |
+| ----------------------------------- | ------------------------------------------------ |
+| `pnpm start`                        | Expo dev server (QR + Expo Go)                   |
+| `pnpm android` / `pnpm ios`         | Native build on the connected device / simulator |
+| `pnpm web`                          | Web build (same JS bundle)                       |
+| `pnpm test`                         | Jest, 21 suites / 96 tests                       |
+| `pnpm test:watch`                   | Jest watch mode                                  |
+| `pnpm test:coverage`                | Jest with coverage                               |
+| `pnpm typecheck`                    | `tsc --noEmit`                                   |
+| `pnpm lint` / `pnpm lint:fix`       | ESLint, 0 warnings enforced                      |
+| `pnpm format` / `pnpm format:check` | Prettier                                         |
+| `pnpm setup:review`                 | Installs the GGA pre-commit hook                 |
 
 ---
 
@@ -120,9 +122,9 @@ PRs reference the OpenSpec change in their body. Archive the change (or leave it
 pnpm test
 ```
 
-19 suites, 76 tests. Domain and application tests run **without** React, Zustand, or AsyncStorage — they only exercise the business logic with in-memory doubles (`InMemoryBookingRepository`, `InMemoryBookingStateAdapter`, `FixedClock`).
+21 suites, 96 tests (re-verified 2026-09-26 against the current commit). Domain and application tests run **without** React, Zustand, or AsyncStorage — they only exercise the business logic with in-memory doubles (`InMemoryBookingRepository`, `InMemoryBookingStateAdapter`, `FixedClock`).
 
-The 76-test gate is the regression floor. Every PR must keep it green.
+The 96-test gate is the regression floor. Every PR must keep it green.
 
 ---
 
@@ -178,3 +180,10 @@ adb install -r https://expo.dev/artifacts/eas/Sh-zQ0JQGsDoemTtfI-kN_FsUDVYPRcMhK
 ```
 
 You may need to enable **Install unknown apps** for your browser or `adb` source in Android settings. The bundle id is `com.pandadesigner.clasefit`.
+
+> **Freshness note (2026-09-26)**: the URLs above point at the last signed
+> `preview` APK produced by EAS for this project. EAS artifacts expire and
+> rotate; before sharing externally, re-run `eas build -p android --profile preview`
+> and update the links if needed. The remaining blockers for store
+> publication (Play Console / Apple Developer / privacy / listing) are
+> tracked in `docs/checklist_release.md`.

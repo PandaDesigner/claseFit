@@ -5,10 +5,7 @@ import { useComposition } from '@features/class-booking/compositionProvider';
 import { useMyBookings } from '@features/class-booking/presentation/hooks/useMyBookings';
 import { useBookingCommands } from '@features/class-booking/presentation/hooks/useBookingCommands';
 import { BookingCard } from '@features/class-booking/presentation/components/BookingCard';
-import {
-  CancellationSheet,
-  type SessionPreview,
-} from '@shared/ui/components/CancellationSheet';
+import { CancellationSheet, type SessionPreview } from '@shared/ui/components/CancellationSheet';
 import { SuccessCheckmark } from '@shared/ui/components/SuccessCheckmark';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
@@ -30,13 +27,7 @@ function computeDiaOffset(now: Date, sessionStart: Date): 0 | 1 | 2 | 3 | 4 | 5 
   ).getTime();
   const diffMs = startOfSession - startOfNow;
   return Math.max(0, Math.min(6, Math.round(diffMs / (24 * 60 * 60 * 1000)))) as
-    | 0
-    | 1
-    | 2
-    | 3
-    | 4
-    | 5
-    | 6;
+    0 | 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 interface DaySection {
@@ -57,9 +48,13 @@ function groupBookingsByDay(
   }
   const sortedOffsets = Array.from(buckets.keys()).sort((a, b) => a - b);
   return sortedOffsets.map((offset) => {
-    const data = (buckets.get(offset) ?? []).sort((a, b) => a.sessionStart.getTime() - b.sessionStart.getTime());
+    const data = (buckets.get(offset) ?? []).sort(
+      (a, b) => a.sessionStart.getTime() - b.sessionStart.getTime(),
+    );
     const representative = data[0];
-    const title = representative ? dayLabel(offset, representative.sessionStart) : dayLabel(offset, now);
+    const title = representative
+      ? dayLabel(offset, representative.sessionStart)
+      : dayLabel(offset, now);
     return { title, data };
   });
 }
@@ -125,65 +120,66 @@ export function MyBookingsScreen() {
     [bookings, composition.clock],
   );
 
-  const content = bookings.length === 0 ? (
-    <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <BrandHeader />
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>{messages.emptyBookings}</Text>
-        <Text style={styles.emptyHint}>Vuelve a Clases para reservar.</Text>
-      </View>
-    </SafeAreaView>
-  ) : (
-    <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <View style={styles.container}>
-        <SectionList
-          sections={sections}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={[
-            styles.list,
-            {
-              paddingBottom:
-                Math.max(insets.bottom, designTokens.spacing.md) +
-                designTokens.tabBarHeight +
-                designTokens.spacing.lg,
-            },
-          ]}
-          SectionSeparatorComponent={() => <View style={styles.sectionGap} />}
-          ItemSeparatorComponent={() => <View style={styles.itemGap} />}
-          renderSectionHeader={({ section }) => (
-            <FadeInOnView style={styles.sectionHeader}>
-              <Text style={styles.sectionHeaderText}>{section.title}</Text>
-            </FadeInOnView>
-          )}
-          renderItem={({ item }) => (
-            <BookingCard.Root
-              id={item.id}
-              sessionId={item.sessionId}
-              sessionName={item.sessionName}
-              sessionStart={item.sessionStart}
-              durationMinutes={item.durationMinutes}
-              instructor={item.instructor}
-              cancellable={item.cancellable}
-              onCancel={handleCancel}
-            >
-              <BookingCard.Body />
-              <BookingCard.Actions />
-            </BookingCard.Root>
-          )}
-        />
-        <CancellationSheet.Root
-          visible={Boolean(selectedBookingId)}
-          onKeep={keepBooking}
-          onConfirm={confirmCancel}
-          sessionPreview={sessionPreview}
-        >
-          <CancellationSheet.Title />
-          <CancellationSheet.Description />
-          <CancellationSheet.Actions />
-        </CancellationSheet.Root>
-      </View>
-    </SafeAreaView>
-  );
+  const content =
+    bookings.length === 0 ? (
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <BrandHeader />
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>{messages.emptyBookings}</Text>
+          <Text style={styles.emptyHint}>Vuelve a Clases para reservar.</Text>
+        </View>
+      </SafeAreaView>
+    ) : (
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <View style={styles.container}>
+          <SectionList
+            sections={sections}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.list,
+              {
+                paddingBottom:
+                  Math.max(insets.bottom, designTokens.spacing.md) +
+                  designTokens.tabBarHeight +
+                  designTokens.spacing.lg,
+              },
+            ]}
+            SectionSeparatorComponent={() => <View style={styles.sectionGap} />}
+            ItemSeparatorComponent={() => <View style={styles.itemGap} />}
+            renderSectionHeader={({ section }) => (
+              <FadeInOnView style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>{section.title}</Text>
+              </FadeInOnView>
+            )}
+            renderItem={({ item }) => (
+              <BookingCard.Root
+                id={item.id}
+                sessionId={item.sessionId}
+                sessionName={item.sessionName}
+                sessionStart={item.sessionStart}
+                durationMinutes={item.durationMinutes}
+                instructor={item.instructor}
+                cancellable={item.cancellable}
+                onCancel={handleCancel}
+              >
+                <BookingCard.Body />
+                <BookingCard.Actions />
+              </BookingCard.Root>
+            )}
+          />
+          <CancellationSheet.Root
+            visible={Boolean(selectedBookingId)}
+            onKeep={keepBooking}
+            onConfirm={confirmCancel}
+            sessionPreview={sessionPreview}
+          >
+            <CancellationSheet.Title />
+            <CancellationSheet.Description />
+            <CancellationSheet.Actions />
+          </CancellationSheet.Root>
+        </View>
+      </SafeAreaView>
+    );
 
   return (
     <>

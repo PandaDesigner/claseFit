@@ -3,6 +3,7 @@
 PR #1 (Clases) and PR #3 (Mis reservas) introduced the visual identity: pastel category cards, pixel pattern, brand header, floating tab bar. The interactions are functionally correct but visually inert. PR #4 closes the loop by adding minimal motion that confirms each interaction.
 
 Constraints:
+
 - No new dependencies (the user has not requested reanimated, and the MVP does not need spring physics).
 - Animation duration is short (≤ 220 ms) so motion never blocks the user.
 - Single-shot animations (mount, scroll-into-view) rather than looping/attention-grabbing.

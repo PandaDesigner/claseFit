@@ -66,10 +66,7 @@ export function ClipboardIcon({ color, size = ICON_SIZE_DEFAULT }: TabIconProps)
   const clipHeight = Math.round(size * 0.18);
   return (
     <View
-      style={[
-        styles.clipboardContainer,
-        { width: size, height: size },
-      ]}
+      style={[styles.clipboardContainer, { width: size, height: size }]}
       accessible={false}
       importantForAccessibility="no"
     >
