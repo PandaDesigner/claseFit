@@ -52,6 +52,7 @@ android/local.properties
 
 # Signing / keystores (NEVER commit)
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
