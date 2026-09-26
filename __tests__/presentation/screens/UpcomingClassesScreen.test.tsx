@@ -13,7 +13,11 @@ jest.mock('@shared/ui/components/BookingGateSheet', () => {
   // which jest-expo does not expose). It captures the latest props so the test
   // can invoke onConfirm / onCancel without relying on jest.fn() tracking (which
   // is unreliable for module-factory mocks under jest-expo).
-  let lastProps: { onConfirm: () => Promise<void> | void; onCancel: () => void; visible: boolean } | null = null;
+  let lastProps: {
+    onConfirm: () => Promise<void> | void;
+    onCancel: () => void;
+    visible: boolean;
+  } | null = null;
   const mockRoot: React.ComponentType<any> = (props: any) => {
     lastProps = { onConfirm: props.onConfirm, onCancel: props.onCancel, visible: props.visible };
     return mockReact.createElement(mockContent, {
@@ -67,7 +71,9 @@ const CANCEL_PILL = 'Elegir otra';
 const CONFIRM_PILL = 'Sí, reservar';
 
 function getGateLastProps() {
-  return (BookingGateSheet.Root as unknown as { __getLastProps: () => unknown }).__getLastProps() as {
+  return (
+    BookingGateSheet.Root as unknown as { __getLastProps: () => unknown }
+  ).__getLastProps() as {
     onConfirm: () => Promise<void> | void;
     onCancel: () => void;
     visible: boolean;

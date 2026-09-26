@@ -55,11 +55,7 @@ describe('CancellationSheet', () => {
       const onKeep = jest.fn();
       const onConfirm = jest.fn();
       await render(
-        <CancellationSheetContent
-          onKeep={onKeep}
-          onConfirm={onConfirm}
-          testID="cancel"
-        >
+        <CancellationSheetContent onKeep={onKeep} onConfirm={onConfirm} testID="cancel">
           <CancellationSheet.Title />
           <CancellationSheet.Actions />
         </CancellationSheetContent>,

@@ -1,8 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import {
-  SuccessSheet,
-  SuccessSheetContent,
-} from '@shared/ui/components/SuccessSheet';
+import { SuccessSheet, SuccessSheetContent } from '@shared/ui/components/SuccessSheet';
 
 describe('SuccessSheet', () => {
   describe('inner content (renders without Modal wrapping for testability)', () => {

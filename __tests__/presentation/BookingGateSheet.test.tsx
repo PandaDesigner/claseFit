@@ -1,8 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import {
-  BookingGateSheet,
-  BookingGateSheetContent,
-} from '@shared/ui/components/BookingGateSheet';
+import { BookingGateSheet, BookingGateSheetContent } from '@shared/ui/components/BookingGateSheet';
 
 const PROMPT = '¿Reservar esta clase?';
 const DESCRIPTION = 'Tu cupo quedará guardado hasta 2 horas antes de empezar.';
@@ -60,11 +57,7 @@ describe('BookingGateSheet', () => {
       const onCancel = jest.fn();
       const onConfirm = jest.fn();
       await render(
-        <BookingGateSheetContent
-          onCancel={onCancel}
-          onConfirm={onConfirm}
-          testID="book-gate"
-        >
+        <BookingGateSheetContent onCancel={onCancel} onConfirm={onConfirm} testID="book-gate">
           <BookingGateSheet.Title />
           <BookingGateSheet.Actions />
         </BookingGateSheetContent>,

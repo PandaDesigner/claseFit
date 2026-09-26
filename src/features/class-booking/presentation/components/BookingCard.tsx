@@ -1,4 +1,11 @@
-import { Children, createContext, isValidElement, useContext, useMemo, type ReactNode } from 'react';
+import {
+  Children,
+  createContext,
+  isValidElement,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from 'react';
 import { Image, StyleSheet, Text, View, type ImageSourcePropType } from 'react-native';
 import { designTokens } from '@shared/ui/tokens';
 import { categoryColor, categoryAsset, instructorGender } from '@shared/ui/categoryAssets';

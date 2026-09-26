@@ -1,6 +1,6 @@
 ## 1. BookingGateSheet primitive (shared/ui)
 
-- [x] 1.1 **RED** — Add `__tests__/presentation/BookingGateSheet.test.tsx` covering: (a) renders prompt + description (default copy), (b) "Elegir otra" pill calls `onCancel`, (c) "Sí, reservar" pill calls `onConfirm`, (d) backdrop press calls `onCancel`, (e) preview card renders when `sessionPreview` is provided. Mirror `CancellationSheet.test.tsx` shape. *(ref: `booking-confirmation-gate` spec §"Booking requires an explicit confirmation gate" + §"Gate renders a preview of the selected session")*
+- [x] 1.1 **RED** — Add `__tests__/presentation/BookingGateSheet.test.tsx` covering: (a) renders prompt + description (default copy), (b) "Elegir otra" pill calls `onCancel`, (c) "Sí, reservar" pill calls `onConfirm`, (d) backdrop press calls `onCancel`, (e) preview card renders when `sessionPreview` is provided. Mirror `CancellationSheet.test.tsx` shape. _(ref: `booking-confirmation-gate` spec §"Booking requires an explicit confirmation gate" + §"Gate renders a preview of the selected session")_
 - [x] 1.2 **GREEN** — Create `src/shared/ui/components/BookingGateSheet.tsx` mirroring `CancellationSheet.tsx`.
 - [x] 1.3 **REFACTOR** — Verify the compound API matches `CancellationSheet`. Add `accessibilityViewIsModal` on the `<Modal>`.
 
@@ -11,7 +11,7 @@
   - `ExpoNotificationsAdapter.scheduleBookingSuccess` schedules a notification with title `ClaseFit` and body `¡Listo! Tu cupo está reservado` and trigger `5s` (effectively immediate).
   - `ExpoNotificationsAdapter.scheduleCancellationSuccess('Reserva cancelada.')` schedules a notification with title `ClaseFit`, body `Reserva cancelada.`, identifier `cancel-success`.
   - `ExpoNotificationsAdapter.requestPermissions()` returns the granted boolean from `getPermissionsAsync`.
-  - Mock `expo-notifications` via `jest.mock`. *(ref: `booking-success-notification` spec §"Native local notification is scheduled after booking success")*
+  - Mock `expo-notifications` via `jest.mock`. _(ref: `booking-success-notification` spec §"Native local notification is scheduled after booking success")_
 - [ ] 2.2 **GREEN** — Create:
   - `src/features/class-booking/application/ports/NotificationsService.ts` (port).
   - `src/features/class-booking/infrastructure/notifications/InMemoryNotificationsAdapter.ts` (test double).
@@ -26,7 +26,7 @@
 
 ## 4. Replace the in-app SuccessCheckmark with the native notification trigger
 
-- [ ] 4.1 **RED** — Update `__tests__/presentation/hooks/useBookingCommands.test.ts` (or add one) asserting that on successful `book` the `NotificationsService.scheduleBookingSuccess` is called exactly once, and on successful `cancel` `scheduleCancellationSuccess(message)` is called exactly once with the result message. *(ref: `booking-success-notification` spec §"Native local notification is scheduled after booking success" + `class-booking` spec §"Post-action feedback uses the native notification, never a platform Modal")*
+- [ ] 4.1 **RED** — Update `__tests__/presentation/hooks/useBookingCommands.test.ts` (or add one) asserting that on successful `book` the `NotificationsService.scheduleBookingSuccess` is called exactly once, and on successful `cancel` `scheduleCancellationSuccess(message)` is called exactly once with the result message. _(ref: `booking-success-notification` spec §"Native local notification is scheduled after booking success" + `class-booking` spec §"Post-action feedback uses the native notification, never a platform Modal")_
 - [ ] 4.2 **GREEN** — Modify `src/features/class-booking/presentation/hooks/useBookingCommands.ts` to accept `notifications: NotificationsService` and fire the notifications on success.
 - [ ] 4.3 **GREEN** — Update both screens to remove the `confirmedSessionId` / `cancelFeedback` state slots and the `<SuccessCheckmark>` renders.
 - [ ] 4.4 **REFACTOR** — Strengthen the screen tests to assert the in-app overlay is gone (no "¡Listo!" / "Reserva cancelada" `<Text>` in the DOM after success — only the notification port saw the call).

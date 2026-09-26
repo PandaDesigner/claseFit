@@ -29,9 +29,7 @@ export function BrandHeader(_props: BrandHeaderProps = {}) {
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea} accessibilityRole="header">
-      <Animated.View
-        style={[styles.container, { opacity, transform: [{ translateY }] }]}
-      >
+      <Animated.View style={[styles.container, { opacity, transform: [{ translateY }] }]}>
         <View style={styles.brandColumn}>
           <Text style={styles.wordmark}>
             <Text style={styles.wordmarkLight}>Clase</Text>
@@ -45,11 +43,7 @@ export function BrandHeader(_props: BrandHeaderProps = {}) {
             <Text style={styles.tagline}>{messages.taglineLine2}</Text>
             <Text style={styles.tagline}>{messages.taglineLine3}</Text>
           </View>
-          <View
-            style={styles.pixelMark}
-            accessible={false}
-            importantForAccessibility="no"
-          >
+          <View style={styles.pixelMark} accessible={false} importantForAccessibility="no">
             <View style={[styles.pixel, styles.pixelA]} />
             <View style={[styles.pixel, styles.pixelB]} />
             <View style={[styles.pixel, styles.pixelC]} />

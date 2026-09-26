@@ -2,12 +2,12 @@
 
 ## Review Workload Forecast
 
-| Field                   | Value                                              |
-| ----------------------- | -------------------------------------------------- |
+| Field                   | Value                                                            |
+| ----------------------- | ---------------------------------------------------------------- |
 | Estimated changed lines | 250–400 (2 modal components + 1 wrapper + tests + screen wiring) |
-| 400-line budget risk    | Low                                                |
-| Chained PRs recommended | No                                                 |
-| Delivery strategy       | UX + refactor                                      |
+| 400-line budget risk    | Low                                                              |
+| Chained PRs recommended | No                                                               |
+| Delivery strategy       | UX + refactor                                                    |
 
 Decision needed before apply: No
 Chained PRs recommended: No
@@ -16,13 +16,13 @@ Chain strategy: single PR
 
 ## Suggested Work Units (mapped to commits)
 
-| Unit | Goal                                                                              | Commit              |
-| ---- | --------------------------------------------------------------------------------- | ------------------- |
-| 1    | New `SuccessSheet` primitive in `shared/ui` (with tests)                          | `feat(modal)`       |
-| 2    | Move `CancellationSheet` to `shared/ui` + use `<Modal>` (with tests)              | `refactor(modal)`    |
-| 3    | `BookingSuccessSheet` wrapper in `features/class-booking/presentation/components/` | `feat(modal)`       |
-| 4    | Wire `UpcomingClassesScreen` to use `BookingSuccessSheet`, remove the toast       | `feat(classes)`      |
-| 5    | OpenSpec change artifacts                                                          | `docs(openspec)`    |
+| Unit | Goal                                                                               | Commit            |
+| ---- | ---------------------------------------------------------------------------------- | ----------------- |
+| 1    | New `SuccessSheet` primitive in `shared/ui` (with tests)                           | `feat(modal)`     |
+| 2    | Move `CancellationSheet` to `shared/ui` + use `<Modal>` (with tests)               | `refactor(modal)` |
+| 3    | `BookingSuccessSheet` wrapper in `features/class-booking/presentation/components/` | `feat(modal)`     |
+| 4    | Wire `UpcomingClassesScreen` to use `BookingSuccessSheet`, remove the toast        | `feat(classes)`   |
+| 5    | OpenSpec change artifacts                                                          | `docs(openspec)`  |
 
 ## Phase 1: `SuccessSheet` (RED → GREEN)
 

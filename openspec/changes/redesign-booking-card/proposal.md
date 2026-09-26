@@ -3,6 +3,7 @@
 The `feat(ui): redesign Clases screen` change brought the Clases surface up to the design model — image-led cards, pixel pattern, brand header, instructor avatar. The Mis reservas surface is the visual twin (same card archetype, same pixel pattern, same instructor identity) but it still uses the legacy plain-white `BookingCard` with a `PrimaryButton`. Two surfaces that should read as one product today read as two unrelated ones.
 
 This change brings Mis reservas to parity with Clases:
+
 - `BookingCard` becomes the same card archetype as `ClassCard` (2-col layout, pastel category background, pixel pattern, instructor avatar, sport-icon cutout).
 - The only visible button state is **Cancel** (this is the manage surface — cancellation lives here, never in Clases).
 - `MyBookingsScreen` gets the BrandHeader + greeting block + day-grouped SectionList that Clases already has, so the two tabs feel like one product.

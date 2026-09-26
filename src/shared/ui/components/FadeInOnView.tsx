@@ -53,10 +53,7 @@ export function FadeInOnView({
   };
 
   return (
-    <Animated.View
-      style={[style, { opacity }]}
-      onLayout={handleLayout}
-    >
+    <Animated.View style={[style, { opacity }]} onLayout={handleLayout}>
       {children}
     </Animated.View>
   );

@@ -82,7 +82,13 @@ function Message({ children }: { readonly children: ReactNode }) {
   return <Text style={styles.message}>{children}</Text>;
 }
 
-function Actions({ ctaLabel, onPress }: { readonly ctaLabel: string; readonly onPress?: () => void }) {
+function Actions({
+  ctaLabel,
+  onPress,
+}: {
+  readonly ctaLabel: string;
+  readonly onPress?: () => void;
+}) {
   const sheet = useSheet();
   return (
     <View style={styles.actions}>

@@ -50,7 +50,9 @@ export function InstructorAvatar({ name, size = 36 }: InstructorAvatarProps) {
       accessibilityRole="image"
       accessibilityLabel={`Avatar de ${name}`}
     >
-      <Text style={[styles.initials, { fontSize: Math.round(size * 0.4) }]}>{initialsFor(name)}</Text>
+      <Text style={[styles.initials, { fontSize: Math.round(size * 0.4) }]}>
+        {initialsFor(name)}
+      </Text>
     </View>
   );
 }

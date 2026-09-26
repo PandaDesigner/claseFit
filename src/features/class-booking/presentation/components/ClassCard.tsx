@@ -1,11 +1,22 @@
-import { Children, createContext, isValidElement, useContext, useMemo, type ReactNode } from 'react';
+import {
+  Children,
+  createContext,
+  isValidElement,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from 'react';
 import { Image, StyleSheet, Text, View, type ImageSourcePropType } from 'react-native';
 import { designTokens } from '@shared/ui/tokens';
 import { categoryColor, categoryAsset, instructorGender } from '@shared/ui/categoryAssets';
 import { InstructorAvatar } from '@shared/ui/components/InstructorAvatar';
 import { PixelPattern } from '@shared/ui/components/PixelPattern';
 import { Pill as PillComponent, type PillProps } from '@shared/ui/components/Pill';
-import { messages, instructorEyebrow, seatsLabel } from '@features/class-booking/presentation/copy/messages';
+import {
+  messages,
+  instructorEyebrow,
+  seatsLabel,
+} from '@features/class-booking/presentation/copy/messages';
 
 export interface ClassCardProps {
   readonly id: string;
@@ -49,7 +60,10 @@ function deriveActionState(card: ClassCardContextValue): ActionState {
   return { kind: 'available', onBook: () => card.onBook(card.id) };
 }
 
-function buildPillProps(state: ActionState, className: string): {
+function buildPillProps(
+  state: ActionState,
+  className: string,
+): {
   readonly config: PillProps;
   readonly a11yLabel: string;
 } {

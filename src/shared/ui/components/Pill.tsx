@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { designTokens } from '../tokens';
 
-export type PillVariant = 'primary' | 'disabled' | 'success' | 'outline' | 'reserved' | 'destructive';
+export type PillVariant =
+  'primary' | 'disabled' | 'success' | 'outline' | 'reserved' | 'destructive';
 
 export interface PillProps {
   readonly label: string;
@@ -94,10 +95,7 @@ export function Pill({
         onPress?.();
       }}
       testID={testID}
-      style={({ pressed }) => [
-        ...baseStyle,
-        pressed && isInteractive ? styles.pressed : null,
-      ]}
+      style={({ pressed }) => [...baseStyle, pressed && isInteractive ? styles.pressed : null]}
     >
       {content}
     </Pressable>
