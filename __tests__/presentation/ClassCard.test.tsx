@@ -13,7 +13,6 @@ const baseProps = {
   isFull: false,
   isAlreadyReserved: false,
   onBook: jest.fn(),
-  onCancel: jest.fn(),
 } as const;
 
 describe('ClassCard compound', () => {
@@ -45,7 +44,7 @@ describe('ClassCard compound', () => {
     expect(screen.getByText('Llena')).toBeTruthy();
   });
 
-  it('shows the reserved state and exposes cancel action when the session is already reserved', async () => {
+  it('shows a non-interactive Reservada indicator when the session is already reserved', async () => {
     await render(
       <ClassCard.Root {...baseProps} isAlreadyReserved>
         <ClassCard.Header />
@@ -55,7 +54,7 @@ describe('ClassCard compound', () => {
     );
 
     expect(screen.getByText('Reservada')).toBeTruthy();
-    fireEvent.press(screen.getByText('Cancelar'));
-    expect(baseProps.onCancel).toHaveBeenCalledWith('C-01');
+    // Cancelar action lives in Mis reservas, not in the Clases screen
+    expect(screen.queryByText('Cancelar')).toBeNull();
   });
 });
