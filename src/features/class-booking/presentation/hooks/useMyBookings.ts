@@ -12,12 +12,12 @@ export interface UseMyBookingsResult {
 
 export function useMyBookings(store: BookingStateStore, clock: Clock): UseMyBookingsResult {
   const [bookings, setBookings] = useState<readonly ActiveBookingView[]>(() =>
-    new ListActiveBookings({ store }).execute(),
+    new ListActiveBookings({ store, clock }).execute(),
   );
 
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
-      setBookings(new ListActiveBookings({ store }).execute());
+      setBookings(new ListActiveBookings({ store, clock }).execute());
     });
     return () => {
       unsubscribe();
