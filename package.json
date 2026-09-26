@@ -45,9 +45,6 @@
     "react-test-renderer": "^19.2.0",
     "typescript": "~6.0.3"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": ["unrs-resolver"]
-  },
   "jest": {
     "preset": "jest-expo",
     "setupFilesAfterEnv": [
