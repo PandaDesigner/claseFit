@@ -12,14 +12,18 @@ import { RefreshEligibilityOnForeground } from '@features/class-booking/applicat
 import { ListUpcomingSessions } from '@features/class-booking/application/queries/ListUpcomingSessions';
 import { ListActiveBookings } from '@features/class-booking/application/queries/ListActiveBookings';
 import { loadFixture } from '@features/class-booking/infrastructure/fixtures/Fixture';
+import { ExpoNotificationsAdapter } from '@features/class-booking/infrastructure/notifications/ExpoNotificationsAdapter';
+import { InMemoryNotificationsAdapter } from '@features/class-booking/infrastructure/notifications/InMemoryNotificationsAdapter';
 import type { BookingRepository } from '@features/class-booking/application/ports/BookingRepository';
 import type { BookingStateStore } from '@features/class-booking/application/ports/BookingStateStore';
 import type { Clock } from '@features/class-booking/application/ports/Clock';
+import type { NotificationsService } from '@features/class-booking/application/ports/NotificationsService';
 
 export interface CompositionDeps {
   readonly repository: BookingRepository;
   readonly store: BookingStateStore;
   readonly clock: Clock;
+  readonly notifications: NotificationsService;
   readonly storage?: AsyncStorageLike;
 }
 
@@ -33,6 +37,7 @@ export interface Composition {
   readonly store: BookingStateStore;
   readonly repository: BookingRepository;
   readonly clock: Clock;
+  readonly notifications: NotificationsService;
 }
 
 export function buildComposition(deps: CompositionDeps): Composition {
@@ -66,6 +71,7 @@ export function buildComposition(deps: CompositionDeps): Composition {
     store: deps.store,
     repository: deps.repository,
     clock: deps.clock,
+    notifications: deps.notifications,
   };
 }
 
@@ -77,16 +83,19 @@ export function buildProductionComposition(options: ProductionCompositionOptions
   const repository = new AsyncStorageBookingRepository({ storage: options.storage });
   const store = new ZustandBookingStateAdapter();
   const clock = new SystemClock();
-  return buildComposition({ repository, store, clock, storage: options.storage });
+  const notifications = new ExpoNotificationsAdapter();
+  return buildComposition({ repository, store, clock, notifications, storage: options.storage });
 }
 
 export interface TestCompositionOptions {
   readonly clock?: Clock;
+  readonly notifications?: NotificationsService;
 }
 
 export function buildTestComposition(options: TestCompositionOptions = {}): Composition {
   const repository = new InMemoryBookingRepository();
   const store = new InMemoryBookingStateAdapter();
   const clock = options.clock ?? new FixedClock(new Date('2026-03-02T13:00:00.000-05:00'));
-  return buildComposition({ repository, store, clock });
+  const notifications = options.notifications ?? new InMemoryNotificationsAdapter();
+  return buildComposition({ repository, store, clock, notifications });
 }
