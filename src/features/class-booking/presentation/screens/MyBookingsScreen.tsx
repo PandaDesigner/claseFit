@@ -10,6 +10,7 @@ import {
   type SessionPreview,
 } from '@features/class-booking/presentation/components/CancellationSheet';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
+import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { PrimaryButton } from '@shared/ui/components/PrimaryButton';
 import { designTokens } from '@shared/ui/tokens';
 import { categoryColor } from '@shared/ui/categoryAssets';
@@ -141,7 +142,9 @@ export function MyBookingsScreen() {
           SectionSeparatorComponent={() => <View style={styles.sectionGap} />}
           ItemSeparatorComponent={() => <View style={styles.itemGap} />}
           renderSectionHeader={({ section }) => (
-            <Text style={styles.sectionHeader}>{section.title}</Text>
+            <FadeInOnView style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>{section.title}</Text>
+            </FadeInOnView>
           )}
           renderItem={({ item }) => (
             <BookingCard.Root
@@ -200,11 +203,13 @@ const styles = StyleSheet.create({
     height: designTokens.spacing.md,
   },
   sectionHeader: {
+    marginTop: designTokens.spacing.md,
+    marginBottom: designTokens.spacing.sm,
+  },
+  sectionHeaderText: {
     fontSize: designTokens.fontSize.title,
     fontWeight: '700',
     color: designTokens.color.textPrimary,
-    marginTop: designTokens.spacing.md,
-    marginBottom: designTokens.spacing.sm,
   },
   emptyContainer: {
     flex: 1,
