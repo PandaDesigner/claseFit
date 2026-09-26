@@ -56,7 +56,8 @@
     ],
     "moduleNameMapper": {
       "^@features/(.*)$": "<rootDir>/src/features/$1",
-      "^@shared/(.*)$": "<rootDir>/src/shared/$1"
+      "^@shared/(.*)$": "<rootDir>/src/shared/$1",
+      "\\.(png|jpg|jpeg|gif|webp)$": "<rootDir>/__mocks__/fileMock.js"
     }
   },
   "private": true
