@@ -1,0 +1,12 @@
+name: PR Previews
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  build:
+    type: build
+    params:
+      profile: preview
+      platform: ALL
+      message: ${{ github.event.pull_request.title }}

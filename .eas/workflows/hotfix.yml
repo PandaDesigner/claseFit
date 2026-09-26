@@ -1,0 +1,20 @@
+name: Hotfix
+on:
+  push:
+    branches:
+      - 'hotfix/**'
+  workflow_dispatch:
+    inputs:
+      profile:
+        type: choice
+        options:
+          - production
+          - preview
+        default: production
+jobs:
+  build:
+    type: build
+    params:
+      profile: ${{ inputs.profile || 'production' }}
+      platform: ALL
+      message: ${{ github.event.head_commit.message || 'Manual hotfix trigger' }}
