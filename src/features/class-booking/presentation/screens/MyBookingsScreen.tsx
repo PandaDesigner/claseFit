@@ -8,10 +8,10 @@ import { BookingCard } from '@features/class-booking/presentation/components/Boo
 import {
   CancellationSheet,
   type SessionPreview,
-} from '@features/class-booking/presentation/components/CancellationSheet';
+} from '@shared/ui/components/CancellationSheet';
+import { SuccessSheet } from '@shared/ui/components/SuccessSheet';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
-import { PrimaryButton } from '@shared/ui/components/PrimaryButton';
 import { designTokens } from '@shared/ui/tokens';
 import { categoryColor } from '@shared/ui/categoryAssets';
 import { dayLabel, messages } from '@features/class-booking/presentation/copy/messages';
@@ -173,10 +173,15 @@ export function MyBookingsScreen() {
           <CancellationSheet.Actions />
         </CancellationSheet.Root>
         {feedback ? (
-          <View accessibilityRole="alert" style={styles.feedback}>
-            <Text style={styles.feedbackText}>{feedback}</Text>
-            <PrimaryButton label="Cerrar" onPress={() => setFeedback(null)} />
-          </View>
+          <SuccessSheet.Root
+            visible
+            onDismiss={() => setFeedback(null)}
+            testID="cancel-success"
+          >
+            <SuccessSheet.Title>Reserva cancelada</SuccessSheet.Title>
+            <SuccessSheet.Message>{feedback}</SuccessSheet.Message>
+            <SuccessSheet.Actions ctaLabel={messages.successCta} />
+          </SuccessSheet.Root>
         ) : null}
       </View>
     </SafeAreaView>
@@ -237,10 +242,5 @@ const styles = StyleSheet.create({
     borderRadius: designTokens.radius.control,
     backgroundColor: designTokens.color.successSurface,
     gap: designTokens.spacing.sm,
-  },
-  feedbackText: {
-    color: designTokens.color.successText,
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
