@@ -1,0 +1,56 @@
+name: gga
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  gga:
+    name: gga review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go (for Linuxbrew)
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install Linuxbrew
+        run: |
+          set -euxo pipefail
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo "$HOME/.linuxbrew/bin" >> "$GITHUB_PATH"
+          eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+          brew --version
+
+      - name: Tap homebrew-tap and install gga
+        run: |
+          set -euxo pipefail
+          eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+          brew tap Gentleman-Programming/homebrew-tap
+          brew install gga
+
+      - name: gga review (PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euxo pipefail
+          eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+          gga run --pr-mode --diff-only
+
+      - name: gga review (push to develop)
+        if: github.event_name == 'push'
+        run: |
+          set -euxo pipefail
+          eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+          gga run --ci
