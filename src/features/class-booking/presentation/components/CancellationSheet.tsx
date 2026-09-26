@@ -1,13 +1,24 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { designTokens } from '@shared/ui/tokens';
-import { PrimaryButton } from '@shared/ui/components/PrimaryButton';
+import { Pill } from '@shared/ui/components/Pill';
+import { PixelPattern } from '@shared/ui/components/PixelPattern';
 import { messages } from '../copy/messages';
+
+export interface SessionPreview {
+  readonly name: string;
+  readonly categoryColor: string;
+  readonly dateLabel: string;
+  readonly timeLabel: string;
+  readonly durationMinutes: number;
+  readonly instructor: string;
+}
 
 export interface CancellationSheetProps {
   readonly visible: boolean;
   readonly onKeep: () => void;
   readonly onConfirm: () => void;
+  readonly sessionPreview?: SessionPreview | null;
   readonly children: ReactNode;
 }
 
@@ -25,13 +36,19 @@ function useSheet(): CancellationSheetContextValue {
 
 function Root(props: CancellationSheetProps) {
   const value = useMemo<CancellationSheetContextValue>(() => ({ ...props }), [props]);
-  if (!value.visible) {
+  if (!props.visible) {
     return null;
   }
   return (
     <Context.Provider value={value}>
       <View style={styles.overlay} accessibilityViewIsModal>
-        <View style={styles.sheet}>{value.children}</View>
+        <View style={styles.sheet}>
+          <View style={styles.dragHandle} />
+          {props.children}
+          {props.sessionPreview ? (
+            <SessionPreviewCard preview={props.sessionPreview} />
+          ) : null}
+        </View>
       </View>
     </Context.Provider>
   );
@@ -49,10 +66,42 @@ function Actions() {
   const sheet = useSheet();
   return (
     <View style={styles.actions}>
-      <PrimaryButton label={messages.keepBooking} onPress={sheet.onKeep} />
-      <Pressable accessibilityRole="button" onPress={sheet.onConfirm} style={styles.destructive}>
-        <Text style={styles.destructiveLabel}>{messages.confirmCancel}</Text>
-      </Pressable>
+      <Pill
+        label={messages.keepBooking}
+        variant="primary"
+        onPress={sheet.onKeep}
+        accessibilityLabel="Mantener tu reserva actual"
+        style={styles.actionPill}
+      />
+      <Pill
+        label={messages.confirmCancel}
+        variant="destructive"
+        onPress={sheet.onConfirm}
+        accessibilityLabel="Confirmar cancelación"
+        style={styles.actionPill}
+      />
+    </View>
+  );
+}
+
+function SessionPreviewCard({ preview }: { preview: SessionPreview }) {
+  return (
+    <View
+      style={[styles.previewCard, { backgroundColor: preview.categoryColor }]}
+      accessibilityRole="summary"
+    >
+      <PixelPattern accent={designTokens.color.pixelAccent} opacity={0.35} />
+      <View style={styles.previewContent}>
+        <Text style={styles.previewName} numberOfLines={1}>
+          {preview.name}
+        </Text>
+        <Text style={styles.previewMeta}>
+          {preview.dateLabel} · {preview.timeLabel} · {preview.durationMinutes} min
+        </Text>
+        <Text style={styles.previewInstructor} numberOfLines={1}>
+          {preview.instructor}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -71,38 +120,68 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
     backgroundColor: designTokens.color.cardSurface,
     borderTopLeftRadius: designTokens.radius.card,
     borderTopRightRadius: designTokens.radius.card,
-    padding: designTokens.spacing.xl,
+    paddingHorizontal: designTokens.spacing.lg,
+    paddingTop: designTokens.spacing.md,
+    paddingBottom: designTokens.spacing.xl,
     gap: designTokens.spacing.lg,
   },
+  dragHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: designTokens.color.textTertiary,
+    alignSelf: 'center',
+    marginBottom: designTokens.spacing.sm,
+    opacity: 0.5,
+  },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: designTokens.fontSize.display,
+    fontWeight: '800',
     color: designTokens.color.textPrimary,
+    letterSpacing: -0.6,
+    lineHeight: designTokens.fontSize.display + 2,
   },
   description: {
-    fontSize: 16,
+    fontSize: designTokens.fontSize.bodyLg,
+    color: designTokens.color.textSecondary,
+    lineHeight: designTokens.fontSize.bodyLg + 4,
+  },
+  previewCard: {
+    borderRadius: designTokens.radius.card,
+    padding: designTokens.spacing.lg,
+    overflow: 'hidden',
+    minHeight: 96,
+    justifyContent: 'center',
+  },
+  previewContent: {
+    gap: designTokens.spacing.xs,
+  },
+  previewName: {
+    fontSize: designTokens.fontSize.title,
+    fontWeight: '700',
+    color: designTokens.color.textPrimary,
+    letterSpacing: -0.2,
+  },
+  previewMeta: {
+    fontSize: designTokens.fontSize.body,
+    fontWeight: '600',
+    color: designTokens.color.textPrimary,
+  },
+  previewInstructor: {
+    fontSize: designTokens.fontSize.body,
     color: designTokens.color.textSecondary,
   },
   actions: {
-    gap: designTokens.spacing.md,
+    gap: designTokens.spacing.sm,
   },
-  destructive: {
-    minHeight: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: designTokens.spacing.xl,
-    paddingVertical: designTokens.spacing.md,
-  },
-  destructiveLabel: {
-    color: designTokens.color.destructiveText,
-    fontSize: 16,
-    fontWeight: '600',
+  actionPill: {
+    alignSelf: 'stretch',
   },
 });
