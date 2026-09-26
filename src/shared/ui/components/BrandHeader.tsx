@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { designTokens } from '../tokens';
 import { messages } from '@features/class-booking/presentation/copy/messages';
@@ -8,9 +9,29 @@ export interface BrandHeaderProps {
 }
 
 export function BrandHeader(_props: BrandHeaderProps = {}) {
+  const [opacity] = useState(() => new Animated.Value(0));
+  const [translateY] = useState(() => new Animated.Value(-8));
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 320,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 320,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [opacity, translateY]);
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea} accessibilityRole="header">
-      <View style={styles.container}>
+      <Animated.View
+        style={[styles.container, { opacity, transform: [{ translateY }] }]}
+      >
         <View style={styles.brandColumn}>
           <Text style={styles.wordmark}>
             <Text style={styles.wordmarkLight}>Clase</Text>
@@ -34,7 +55,7 @@ export function BrandHeader(_props: BrandHeaderProps = {}) {
             <View style={[styles.pixel, styles.pixelC]} />
           </View>
         </View>
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }

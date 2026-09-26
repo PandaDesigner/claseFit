@@ -6,6 +6,7 @@ import { useUpcomingSessions } from '@features/class-booking/presentation/hooks/
 import { useBookingCommands } from '@features/class-booking/presentation/hooks/useBookingCommands';
 import { ClassCard } from '@features/class-booking/presentation/components/ClassCard';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
+import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { designTokens } from '@shared/ui/tokens';
 import { dayLabel, messages } from '@features/class-booking/presentation/copy/messages';
 import type { UpcomingSessionView } from '@features/class-booking/application/queries/ListUpcomingSessions';
@@ -86,7 +87,11 @@ export function UpcomingClassesScreen() {
         ]}
         SectionSeparatorComponent={() => <View style={styles.sectionGap} />}
         ItemSeparatorComponent={() => <View style={styles.itemGap} />}
-        renderSectionHeader={({ section }) => <Text style={styles.sectionHeader}>{section.title}</Text>}
+        renderSectionHeader={({ section }) => (
+          <FadeInOnView style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>{section.title}</Text>
+          </FadeInOnView>
+        )}
         renderItem={({ item }) => (
           <ClassCard.Root
             id={item.id}
@@ -153,10 +158,12 @@ const styles = StyleSheet.create({
     height: designTokens.spacing.md,
   },
   sectionHeader: {
+    marginBottom: designTokens.spacing.md,
+  },
+  sectionHeaderText: {
     fontSize: designTokens.fontSize.title,
     fontWeight: '700',
     color: designTokens.color.textPrimary,
-    marginBottom: designTokens.spacing.md,
   },
   feedback: {
     position: 'absolute',
