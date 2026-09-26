@@ -1,0 +1,19 @@
+schema: spec-driven
+context: |
+  Stack objetivo: Expo, React Native, TypeScript strict, Jest.
+  Arquitectura: feature-first y Ports & Adapters dentro de class-booking.
+  Estado: Zustand detrás de BookingStateStore; persistencia: AsyncStorage detrás de BookingRepository.
+  Calidad: SDD en OpenSpec y TDD RED → GREEN → REFACTOR.
+rules:
+  specs:
+    - Usar MUST o SHALL y escenarios Given/When/Then.
+    - Mantener requisitos de negocio separados de detalles de interfaz.
+  design:
+    - Documentar decisiones, puertos, flujos y alternativas.
+  tasks:
+    - Cada comportamiento sigue RED, GREEN y REFACTOR antes de marcarse completo.
+    - Referenciar rutas concretas y escenarios de la spec.
+  apply:
+    - No implementar una tarea sin su prueba roja correspondiente cuando aplique.
+  verify:
+    - Ejecutar pruebas, tipos, lint y comparar cada escenario con evidencia real.
