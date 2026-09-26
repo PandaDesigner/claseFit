@@ -1,16 +1,46 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useComposition } from '@features/class-booking/compositionProvider';
 import { useMyBookings } from '@features/class-booking/presentation/hooks/useMyBookings';
 import { useBookingCommands } from '@features/class-booking/presentation/hooks/useBookingCommands';
-import { BookingCard } from '@features/class-booking/presentation/components/BookingCard';
-import { CancellationSheet } from '@features/class-booking/presentation/components/CancellationSheet';
+import {
+  BookingCard,
+} from '@features/class-booking/presentation/components/BookingCard';
+import {
+  CancellationSheet,
+  type SessionPreview,
+} from '@features/class-booking/presentation/components/CancellationSheet';
 import { PrimaryButton } from '@shared/ui/components/PrimaryButton';
 import { designTokens } from '@shared/ui/tokens';
-import { messages } from '@features/class-booking/presentation/copy/messages';
+import { categoryColor } from '@shared/ui/categoryAssets';
+import { dayLabel, messages } from '@features/class-booking/presentation/copy/messages';
+
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function computeDiaOffset(now: Date, sessionStart: Date): 0 | 1 | 2 | 3 | 4 | 5 | 6 {
+  const startOfNow = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startOfSession = new Date(
+    sessionStart.getFullYear(),
+    sessionStart.getMonth(),
+    sessionStart.getDate(),
+  ).getTime();
+  const diffMs = startOfSession - startOfNow;
+  return Math.max(0, Math.min(6, Math.round(diffMs / (24 * 60 * 60 * 1000)))) as
+    | 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6;
+}
 
 export function MyBookingsScreen() {
   const composition = useComposition();
+  const insets = useSafeAreaInsets();
   const { bookings } = useMyBookings(composition.store, composition.clock);
   const commands = useBookingCommands({
     bookClass: composition.bookClass,
@@ -18,6 +48,25 @@ export function MyBookingsScreen() {
   });
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+
+  const selectedBooking = useMemo(
+    () => (selectedBookingId ? (bookings.find((b) => b.id === selectedBookingId) ?? null) : null),
+    [bookings, selectedBookingId],
+  );
+
+  const sessionPreview = useMemo<SessionPreview | null>(() => {
+    if (!selectedBooking) return null;
+    const now = composition.clock.now();
+    const offset = computeDiaOffset(now, selectedBooking.sessionStart);
+    return {
+      name: selectedBooking.sessionName,
+      categoryColor: categoryColor(selectedBooking.sessionName),
+      dateLabel: dayLabel(offset, selectedBooking.sessionStart),
+      timeLabel: formatTime(selectedBooking.sessionStart),
+      durationMinutes: selectedBooking.durationMinutes,
+      instructor: selectedBooking.instructor,
+    };
+  }, [selectedBooking, composition.clock]);
 
   const handleCancel = (bookingId: string) => {
     setSelectedBookingId(bookingId);
@@ -34,77 +83,94 @@ export function MyBookingsScreen() {
 
   if (bookings.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>{messages.emptyBookings}</Text>
-        <Text style={styles.emptyHint}>Vuelve a Clases para reservar.</Text>
-      </View>
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>{messages.emptyBookings}</Text>
+          <Text style={styles.emptyHint}>Vuelve a Clases para reservar.</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>{messages.myBookingsTab}</Text>
-      <FlatList
-        data={bookings}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <BookingCard.Root
-            id={item.id}
-            sessionId={item.sessionId}
-            sessionName={item.sessionName}
-            sessionStart={item.sessionStart}
-            durationMinutes={item.durationMinutes}
-            instructor={item.instructor}
-            cancellable
-            onCancel={handleCancel}
-          >
-            <BookingCard.Body />
-            <BookingCard.Actions />
-          </BookingCard.Root>
-        )}
-      />
-      <CancellationSheet.Root
-        visible={Boolean(selectedBookingId)}
-        onKeep={keepBooking}
-        onConfirm={confirmCancel}
-      >
-        <CancellationSheet.Title />
-        <CancellationSheet.Description />
-        <CancellationSheet.Actions />
-      </CancellationSheet.Root>
-      {feedback ? (
-        <View accessibilityRole="alert" style={styles.feedback}>
-          <Text style={styles.feedbackText}>{feedback}</Text>
-          <PrimaryButton label="Cerrar" onPress={() => setFeedback(null)} />
-        </View>
-      ) : null}
-    </View>
+    <SafeAreaView edges={['top']} style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.heading}>Mis reservas</Text>
+        <FlatList
+          data={bookings}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={[
+            styles.list,
+            {
+              paddingBottom:
+                Math.max(insets.bottom, designTokens.spacing.md) +
+                designTokens.tabBarHeight +
+                designTokens.spacing.lg,
+            },
+          ]}
+          renderItem={({ item }) => (
+            <BookingCard.Root
+              id={item.id}
+              sessionId={item.sessionId}
+              sessionName={item.sessionName}
+              sessionStart={item.sessionStart}
+              durationMinutes={item.durationMinutes}
+              instructor={item.instructor}
+              cancellable
+              onCancel={handleCancel}
+            >
+              <BookingCard.Body />
+              <BookingCard.Actions />
+            </BookingCard.Root>
+          )}
+        />
+        <CancellationSheet.Root
+          visible={Boolean(selectedBookingId)}
+          onKeep={keepBooking}
+          onConfirm={confirmCancel}
+          sessionPreview={sessionPreview}
+        >
+          <CancellationSheet.Title />
+          <CancellationSheet.Description />
+          <CancellationSheet.Actions />
+        </CancellationSheet.Root>
+        {feedback ? (
+          <View accessibilityRole="alert" style={styles.feedback}>
+            <Text style={styles.feedbackText}>{feedback}</Text>
+            <PrimaryButton label="Cerrar" onPress={() => setFeedback(null)} />
+          </View>
+        ) : null}
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: designTokens.color.background,
+  },
+  container: {
+    flex: 1,
     paddingHorizontal: designTokens.spacing.lg,
-    paddingTop: designTokens.spacing.xl,
+    paddingTop: designTokens.spacing.sm,
   },
   heading: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: designTokens.fontSize.hero,
+    fontWeight: '800',
     color: designTokens.color.textPrimary,
+    letterSpacing: -0.6,
+    marginTop: designTokens.spacing.md,
+    marginBottom: designTokens.spacing.lg,
   },
   list: {
     gap: designTokens.spacing.md,
-    paddingVertical: designTokens.spacing.lg,
   },
   emptyContainer: {
     flex: 1,
-    backgroundColor: designTokens.color.background,
-    paddingHorizontal: designTokens.spacing.lg,
-    paddingTop: designTokens.spacing.xxl,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: designTokens.spacing.lg,
     gap: designTokens.spacing.md,
   },
   emptyText: {
