@@ -38,7 +38,7 @@ export interface Composition {
 export function buildComposition(deps: CompositionDeps): Composition {
   const fixture = loadFixture();
   const listUpcomingSessions = new ListUpcomingSessions({ store: deps.store, clock: deps.clock });
-  const listActiveBookings = new ListActiveBookings({ store: deps.store });
+  const listActiveBookings = new ListActiveBookings({ store: deps.store, clock: deps.clock });
   return {
     initializeBookings: new InitializeBookings({
       repository: deps.repository,
