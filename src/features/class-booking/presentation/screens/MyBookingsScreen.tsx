@@ -9,6 +9,7 @@ import {
   CancellationSheet,
   type SessionPreview,
 } from '@shared/ui/components/CancellationSheet';
+import { SuccessCheckmark } from '@shared/ui/components/SuccessCheckmark';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { designTokens } from '@shared/ui/tokens';
@@ -63,6 +64,11 @@ function groupBookingsByDay(
   });
 }
 
+interface CancelFeedback {
+  readonly bookingId: string;
+  readonly message: string;
+}
+
 export function MyBookingsScreen() {
   const composition = useComposition();
   const insets = useSafeAreaInsets();
@@ -70,9 +76,12 @@ export function MyBookingsScreen() {
   const commands = useBookingCommands({
     bookClass: composition.bookClass,
     cancelBooking: composition.cancelBooking,
-    notifications: composition.notifications,
   });
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  // Transient cancellation feedback rendered via SuccessCheckmark (Animated.View),
+  // NOT a platform <Modal> — this prevents cross-tab modal stacking when the
+  // user switches to Clases while a cancellation feedback is still visible.
+  const [cancelFeedback, setCancelFeedback] = useState<CancelFeedback | null>(null);
 
   const selectedBooking = useMemo(
     () => (selectedBookingId ? (bookings.find((b) => b.id === selectedBookingId) ?? null) : null),
@@ -101,12 +110,15 @@ export function MyBookingsScreen() {
     const id = selectedBookingId;
     setSelectedBookingId(null);
     if (!id) return;
-    await commands.cancel(id);
-    // On success, the hook fires a native local push notification (via the
-    // NotificationsService port) with the cancellation outcome message.
+    const result = await commands.cancel(id);
+    if (result.status === 'success') {
+      setCancelFeedback({ bookingId: id, message: result.message });
+    }
   }, [commands, selectedBookingId]);
 
   const keepBooking = useCallback(() => setSelectedBookingId(null), []);
+
+  const dismissCancelFeedback = useCallback(() => setCancelFeedback(null), []);
 
   const sections = useMemo<readonly SectionListData<ActiveBookingView, DaySection>[]>(
     () => groupBookingsByDay(bookings, composition.clock.now()),
@@ -173,7 +185,19 @@ export function MyBookingsScreen() {
     </SafeAreaView>
   );
 
-  return <>{content}</>;
+  return (
+    <>
+      {content}
+      {cancelFeedback ? (
+        <SuccessCheckmark
+          visible
+          onDismiss={dismissCancelFeedback}
+          label={cancelFeedback.message}
+          testID="cancel-success-checkmark"
+        />
+      ) : null}
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
