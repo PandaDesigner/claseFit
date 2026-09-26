@@ -9,7 +9,6 @@ import {
   CancellationSheet,
   type SessionPreview,
 } from '@shared/ui/components/CancellationSheet';
-import { SuccessSheet } from '@shared/ui/components/SuccessSheet';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { designTokens } from '@shared/ui/tokens';
@@ -71,9 +70,9 @@ export function MyBookingsScreen() {
   const commands = useBookingCommands({
     bookClass: composition.bookClass,
     cancelBooking: composition.cancelBooking,
+    notifications: composition.notifications,
   });
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<string | null>(null);
 
   const selectedBooking = useMemo(
     () => (selectedBookingId ? (bookings.find((b) => b.id === selectedBookingId) ?? null) : null),
@@ -99,10 +98,12 @@ export function MyBookingsScreen() {
   };
 
   const confirmCancel = useCallback(async () => {
-    if (!selectedBookingId) return;
-    const result = await commands.cancel(selectedBookingId);
-    setFeedback(result.message);
+    const id = selectedBookingId;
     setSelectedBookingId(null);
+    if (!id) return;
+    await commands.cancel(id);
+    // On success, the hook fires a native local push notification (via the
+    // NotificationsService port) with the cancellation outcome message.
   }, [commands, selectedBookingId]);
 
   const keepBooking = useCallback(() => setSelectedBookingId(null), []);
@@ -112,19 +113,15 @@ export function MyBookingsScreen() {
     [bookings, composition.clock],
   );
 
-  if (bookings.length === 0) {
-    return (
-      <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <BrandHeader />
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>{messages.emptyBookings}</Text>
-          <Text style={styles.emptyHint}>Vuelve a Clases para reservar.</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  return (
+  const content = bookings.length === 0 ? (
+    <SafeAreaView edges={['top']} style={styles.safeArea}>
+      <BrandHeader />
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>{messages.emptyBookings}</Text>
+        <Text style={styles.emptyHint}>Vuelve a Clases para reservar.</Text>
+      </View>
+    </SafeAreaView>
+  ) : (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <View style={styles.container}>
         <SectionList
@@ -172,20 +169,11 @@ export function MyBookingsScreen() {
           <CancellationSheet.Description />
           <CancellationSheet.Actions />
         </CancellationSheet.Root>
-        {feedback ? (
-          <SuccessSheet.Root
-            visible
-            onDismiss={() => setFeedback(null)}
-            testID="cancel-success"
-          >
-            <SuccessSheet.Title>Reserva cancelada</SuccessSheet.Title>
-            <SuccessSheet.Message>{feedback}</SuccessSheet.Message>
-            <SuccessSheet.Actions ctaLabel={messages.successCta} />
-          </SuccessSheet.Root>
-        ) : null}
       </View>
     </SafeAreaView>
   );
+
+  return <>{content}</>;
 }
 
 const styles = StyleSheet.create({
@@ -232,15 +220,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: designTokens.color.textSecondary,
     textAlign: 'center',
-  },
-  feedback: {
-    position: 'absolute',
-    bottom: designTokens.spacing.xl,
-    left: designTokens.spacing.lg,
-    right: designTokens.spacing.lg,
-    padding: designTokens.spacing.md,
-    borderRadius: designTokens.radius.control,
-    backgroundColor: designTokens.color.successSurface,
-    gap: designTokens.spacing.sm,
   },
 });

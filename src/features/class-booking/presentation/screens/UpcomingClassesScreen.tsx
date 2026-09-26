@@ -1,20 +1,31 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { SectionList, StyleSheet, Text, View, type SectionListData } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useComposition } from '@features/class-booking/compositionProvider';
 import { useUpcomingSessions } from '@features/class-booking/presentation/hooks/useUpcomingSessions';
 import { useBookingCommands } from '@features/class-booking/presentation/hooks/useBookingCommands';
 import { ClassCard } from '@features/class-booking/presentation/components/ClassCard';
-import { BookingSuccessSheet } from '@features/class-booking/presentation/components/BookingSuccessSheet';
+import {
+  BookingGateSheet,
+  type SessionPreview,
+} from '@shared/ui/components/BookingGateSheet';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { designTokens } from '@shared/ui/tokens';
-import { dayLabel, messages } from '@features/class-booking/presentation/copy/messages';
+import { categoryColor } from '@shared/ui/categoryAssets';
+import {
+  dayLabel,
+  messages,
+} from '@features/class-booking/presentation/copy/messages';
 import type { UpcomingSessionView } from '@features/class-booking/application/queries/ListUpcomingSessions';
 
 interface DaySection {
   readonly title: string;
   readonly data: readonly UpcomingSessionView[];
+}
+
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 function computeDiaOffset(now: Date, sessionStart: Date): 0 | 1 | 2 | 3 | 4 | 5 | 6 {
@@ -55,16 +66,49 @@ export function UpcomingClassesScreen() {
   const commands = useBookingCommands({
     bookClass: composition.bookClass,
     cancelBooking: composition.cancelBooking,
+    notifications: composition.notifications,
   });
-  const [feedback, setFeedback] = useState<string | null>(null);
 
-  const handleBook = useMemo(
-    () => async (sessionId: string) => {
-      const result = await commands.book(sessionId);
-      setFeedback(result.message);
-    },
-    [commands],
+  // pendingSessionId drives the confirmation gate. On success, the booking
+  // hook fires a native local push notification (via the NotificationsService
+  // port) — no in-app overlay is rendered.
+  const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
+
+  const handleBook = useCallback((sessionId: string) => {
+    setPendingSessionId(sessionId);
+  }, []);
+
+  const pendingSession = useMemo(
+    () => (pendingSessionId ? (sessions.find((s) => s.id === pendingSessionId) ?? null) : null),
+    [sessions, pendingSessionId],
   );
+
+  const sessionPreview = useMemo<SessionPreview | null>(() => {
+    if (!pendingSession) return null;
+    const offset = computeDiaOffset(composition.clock.now(), pendingSession.start);
+    return {
+      name: pendingSession.name,
+      categoryColor: categoryColor(pendingSession.name),
+      dateLabel: dayLabel(offset, pendingSession.start),
+      timeLabel: formatTime(pendingSession.start),
+      durationMinutes: pendingSession.durationMinutes,
+      instructor: pendingSession.instructor,
+    };
+  }, [pendingSession, composition.clock]);
+
+  const confirmBook = useCallback(async () => {
+    const id = pendingSessionId;
+    setPendingSessionId(null);
+    if (!id) return;
+    await commands.book(id);
+    // On success, the hook fires a native local push notification. The user
+    // sees the FR-05 literal ("¡Listo! Tu cupo está reservado") in the system
+    // notification surface; no in-app overlay is needed.
+  }, [commands, pendingSessionId]);
+
+  const cancelGate = useCallback(() => {
+    setPendingSessionId(null);
+  }, []);
 
   const sections = useMemo<readonly SectionListData<UpcomingSessionView, DaySection>[]>(
     () => groupSessionsByDay(sessions, composition.clock.now()),
@@ -84,7 +128,12 @@ export function UpcomingClassesScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[
           styles.list,
-          { paddingBottom: Math.max(insets.bottom, designTokens.spacing.md) + designTokens.tabBarHeight + designTokens.spacing.lg },
+          {
+            paddingBottom:
+              Math.max(insets.bottom, designTokens.spacing.md) +
+              designTokens.tabBarHeight +
+              designTokens.spacing.lg,
+          },
         ]}
         SectionSeparatorComponent={() => <View style={styles.sectionGap} />}
         ItemSeparatorComponent={() => <View style={styles.itemGap} />}
@@ -113,12 +162,18 @@ export function UpcomingClassesScreen() {
           </ClassCard.Root>
         )}
       />
-      {feedback ? (
-        <BookingSuccessSheet
+      {pendingSession ? (
+        <BookingGateSheet.Root
           visible
-          onDismiss={() => setFeedback(null)}
-          testID="booking-success"
-        />
+          onCancel={cancelGate}
+          onConfirm={confirmBook}
+          sessionPreview={sessionPreview}
+          testID="booking-gate"
+        >
+          <BookingGateSheet.Title />
+          <BookingGateSheet.Description />
+          <BookingGateSheet.Actions />
+        </BookingGateSheet.Root>
       ) : null}
     </View>
   );
