@@ -1,9 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { Text } from 'react-native';
 import { UpcomingClassesScreen } from '@features/class-booking/presentation/screens/UpcomingClassesScreen';
 import { MyBookingsScreen } from '@features/class-booking/presentation/screens/MyBookingsScreen';
-import { messages } from '@features/class-booking/presentation/copy/messages';
+import { FloatingTabBar } from './components/FloatingTabBar';
 
 const Tab = createBottomTabNavigator();
 
@@ -12,21 +11,12 @@ export function RootTabs() {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: '#191B1D',
-          tabBarInactiveTintColor: '#51565C',
           headerShown: false,
         }}
+        tabBar={(props) => <FloatingTabBar {...props} />}
       >
-        <Tab.Screen
-          name={messages.classesTab}
-          component={UpcomingClassesScreen}
-          options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>📅</Text> }}
-        />
-        <Tab.Screen
-          name={messages.myBookingsTab}
-          component={MyBookingsScreen}
-          options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>📋</Text> }}
-        />
+        <Tab.Screen name="Clases" component={UpcomingClassesScreen} />
+        <Tab.Screen name="Mis reservas" component={MyBookingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
