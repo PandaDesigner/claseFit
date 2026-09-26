@@ -5,6 +5,7 @@ import { useComposition } from '@features/class-booking/compositionProvider';
 import { useUpcomingSessions } from '@features/class-booking/presentation/hooks/useUpcomingSessions';
 import { useBookingCommands } from '@features/class-booking/presentation/hooks/useBookingCommands';
 import { ClassCard } from '@features/class-booking/presentation/components/ClassCard';
+import { BookingSuccessSheet } from '@features/class-booking/presentation/components/BookingSuccessSheet';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { designTokens } from '@shared/ui/tokens';
@@ -113,9 +114,11 @@ export function UpcomingClassesScreen() {
         )}
       />
       {feedback ? (
-        <View accessibilityRole="alert" style={styles.feedback}>
-          <Text style={styles.feedbackText}>{feedback}</Text>
-        </View>
+        <BookingSuccessSheet
+          visible
+          onDismiss={() => setFeedback(null)}
+          testID="booking-success"
+        />
       ) : null}
     </View>
   );
@@ -164,19 +167,5 @@ const styles = StyleSheet.create({
     fontSize: designTokens.fontSize.title,
     fontWeight: '700',
     color: designTokens.color.textPrimary,
-  },
-  feedback: {
-    position: 'absolute',
-    bottom: designTokens.spacing.xl,
-    left: designTokens.spacing.lg,
-    right: designTokens.spacing.lg,
-    padding: designTokens.spacing.md,
-    borderRadius: designTokens.radius.control,
-    backgroundColor: designTokens.color.successSurface,
-  },
-  feedbackText: {
-    color: designTokens.color.successText,
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
