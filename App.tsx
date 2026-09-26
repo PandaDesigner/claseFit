@@ -4,6 +4,7 @@ import { buildProductionComposition, type Composition } from '@features/class-bo
 import { RootTabs } from './src/navigation/RootTabs';
 import { ActivityIndicator, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   const [composition, setComposition] = useState<Composition | null>(null);
@@ -21,15 +22,19 @@ export default function App() {
 
   if (!composition) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
+      <SafeAreaProvider>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator />
+        </View>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <CompositionProvider composition={composition}>
-      <RootTabs />
-    </CompositionProvider>
+    <SafeAreaProvider>
+      <CompositionProvider composition={composition}>
+        <RootTabs />
+      </CompositionProvider>
+    </SafeAreaProvider>
   );
 }
