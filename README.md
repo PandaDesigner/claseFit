@@ -134,7 +134,16 @@ The `android/` directory is committed (Expo's `prebuild` output) so a fresh clon
 pnpm android   # builds and runs on the connected Android device
 ```
 
-For production builds via EAS, configure `.eas/build.json` (follow-up PR).
+EAS handles signed cloud builds for distribution. Profiles are defined in `eas.json`:
+
+- `development` — dev client with `expo-dev-client`
+- `preview` — signed APK for internal testing (see **Try it** below)
+- `production` — auto-incrementing version for Play Store submission
+
+```bash
+eas build -p android --profile preview   # internal APK
+eas build -p android --profile production
+```
 
 ---
 
@@ -150,3 +159,22 @@ FR-06 (empty):     "Aún no tienes reservas"
 ```
 
 Deterministic precedence when multiple rules fail: RN-01 → RN-02 → RN-03.
+
+---
+
+## Try it
+
+The latest signed `preview` APK (Android) is built via EAS. Scan the QR with your phone's camera to start the download, or use the direct link.
+
+![Scan to download the ClaseFit preview APK](./assets/preview-apk-qr.png)
+
+- **APK direct download**: <https://expo.dev/artifacts/eas/Sh-zQ0JQGsDoemTtfI-kN_FsUDVYPRcMhKQ9SnZUbU0.apk>
+- **EAS build page** (with logs + alternate install options): <https://expo.dev/accounts/panda-designer/projects/clasefit/builds/2d84bc69-45a2-4b33-bb6b-c041f012cb5e>
+
+Sideload onto a connected device:
+
+```bash
+adb install -r https://expo.dev/artifacts/eas/Sh-zQ0JQGsDoemTtfI-kN_FsUDVYPRcMhKQ9SnZUbU0.apk
+```
+
+You may need to enable **Install unknown apps** for your browser or `adb` source in Android settings. The bundle id is `com.pandadesigner.clasefit`.
