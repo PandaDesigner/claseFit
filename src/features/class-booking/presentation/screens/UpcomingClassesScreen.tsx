@@ -9,6 +9,7 @@ import {
   BookingGateSheet,
   type SessionPreview,
 } from '@shared/ui/components/BookingGateSheet';
+import { SuccessCheckmark } from '@shared/ui/components/SuccessCheckmark';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { designTokens } from '@shared/ui/tokens';
@@ -66,13 +67,13 @@ export function UpcomingClassesScreen() {
   const commands = useBookingCommands({
     bookClass: composition.bookClass,
     cancelBooking: composition.cancelBooking,
-    notifications: composition.notifications,
   });
 
-  // pendingSessionId drives the confirmation gate. On success, the booking
-  // hook fires a native local push notification (via the NotificationsService
-  // port) — no in-app overlay is rendered.
+  // Two mutually-exclusive state slots:
+  // - pendingSessionId drives the gate.
+  // - confirmedSessionId drives the checkmark.
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
+  const [confirmedSessionId, setConfirmedSessionId] = useState<string | null>(null);
 
   const handleBook = useCallback((sessionId: string) => {
     setPendingSessionId(sessionId);
@@ -100,14 +101,20 @@ export function UpcomingClassesScreen() {
     const id = pendingSessionId;
     setPendingSessionId(null);
     if (!id) return;
-    await commands.book(id);
-    // On success, the hook fires a native local push notification. The user
-    // sees the FR-05 literal ("¡Listo! Tu cupo está reservado") in the system
-    // notification surface; no in-app overlay is needed.
+    const result = await commands.book(id);
+    if (result.status === 'success') {
+      setConfirmedSessionId(id);
+    }
+    // On rejection (RN-01/RN-02/RN-03) no overlay is shown — the gate only opens for eligible
+    // bookings, and surfacing the rejection copy is a follow-up concern outside this change.
   }, [commands, pendingSessionId]);
 
   const cancelGate = useCallback(() => {
     setPendingSessionId(null);
+  }, []);
+
+  const dismissCheck = useCallback(() => {
+    setConfirmedSessionId(null);
   }, []);
 
   const sections = useMemo<readonly SectionListData<UpcomingSessionView, DaySection>[]>(
@@ -174,6 +181,14 @@ export function UpcomingClassesScreen() {
           <BookingGateSheet.Description />
           <BookingGateSheet.Actions />
         </BookingGateSheet.Root>
+      ) : null}
+      {confirmedSessionId ? (
+        <SuccessCheckmark
+          visible
+          onDismiss={dismissCheck}
+          label={messages.success}
+          testID="booking-success-checkmark"
+        />
       ) : null}
     </View>
   );

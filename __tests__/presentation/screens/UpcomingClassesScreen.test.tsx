@@ -5,7 +5,6 @@ import { buildTestComposition } from '@features/class-booking/composition';
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { BookingGateSheet } from '@shared/ui/components/BookingGateSheet';
-import { InMemoryNotificationsAdapter } from '@features/class-booking/infrastructure/notifications/InMemoryNotificationsAdapter';
 
 jest.mock('@shared/ui/components/BookingGateSheet', () => {
   const actualModule = jest.requireActual('@shared/ui/components/BookingGateSheet');
@@ -37,6 +36,16 @@ jest.mock('@shared/ui/components/BookingGateSheet', () => {
   };
 });
 
+jest.mock('@shared/ui/components/SuccessCheckmark', () => ({
+  SuccessCheckmark: (props: { label: string }) => {
+    return mockReact.createElement(
+      mockReact.Fragment,
+      null,
+      mockReact.createElement('Text', null, props.label),
+    );
+  },
+}));
+
 const renderScreen = (composition: ReturnType<typeof buildTestComposition>) =>
   render(
     <SafeAreaProvider
@@ -51,6 +60,7 @@ const renderScreen = (composition: ReturnType<typeof buildTestComposition>) =>
     </SafeAreaProvider>,
   );
 
+const FR05 = '¡Listo! Tu cupo está reservado';
 const GATE_PROMPT = '¿Reservar esta clase?';
 const GATE_DESCRIPTION = 'Tu cupo quedará guardado hasta 2 horas antes de empezar.';
 const CANCEL_PILL = 'Elegir otra';
@@ -85,9 +95,8 @@ describe('UpcomingClassesScreen', () => {
     expect(sessionId).toBeTruthy();
   });
 
-  it('persists the booking and fires the native booking notification after the gate is confirmed', async () => {
-    const notifications = new InMemoryNotificationsAdapter();
-    const composition = buildTestComposition({ notifications });
+  it('persists the booking and shows the checkmark after the gate is confirmed', async () => {
+    const composition = buildTestComposition();
     await composition.initializeBookings.execute();
 
     await renderScreen(composition);
@@ -103,24 +112,10 @@ describe('UpcomingClassesScreen', () => {
     await act(async () => {
       await gateProps!.onConfirm();
     });
-    // Flush the async bookClass → notification chain.
-    await act(async () => {
-      await Promise.resolve();
-    });
 
     expect(composition.store.getSnapshot()?.bookings).toHaveLength(1);
-
-    // The booking notification was scheduled exactly once with the FR-05 literal.
-    const scheduled = notifications.getScheduled();
-    expect(scheduled).toHaveLength(1);
-    expect(scheduled[0]).toMatchObject({
-      title: 'ClaseFit',
-      body: '¡Listo! Tu cupo está reservado',
-      identifier: 'booking-success',
-    });
-
-    // The FR-05 literal must NOT appear in the in-app tree (no more in-app overlay).
-    expect(screen.queryByText('¡Listo! Tu cupo está reservado')).toBeNull();
+    // FR-05 literal appears exactly once (no duplicated "¡Listo!" — the duplication regression cannot recur).
+    expect(screen.getAllByText(FR05)).toHaveLength(1);
   });
 
   it('does not persist a booking when the gate is dismissed via "Elegir otra"', async () => {

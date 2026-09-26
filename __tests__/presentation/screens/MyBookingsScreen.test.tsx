@@ -1,10 +1,27 @@
+import * as mockReact from 'react';
 import { MyBookingsScreen } from '@features/class-booking/presentation/screens/MyBookingsScreen';
 import { CompositionProvider } from '@features/class-booking/compositionProvider';
 import { buildTestComposition } from '@features/class-booking/composition';
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { messages } from '@features/class-booking/presentation/copy/messages';
-import { InMemoryNotificationsAdapter } from '@features/class-booking/infrastructure/notifications/InMemoryNotificationsAdapter';
+import { SuccessCheckmark } from '@shared/ui/components/SuccessCheckmark';
+
+// Mock the SuccessCheckmark so the test can assert it is mounted without relying
+// on the real Animated.View (which jest-expo does not render fully).
+jest.mock('@shared/ui/components/SuccessCheckmark', () => {
+  let lastProps: { visible: boolean; label: string; onDismiss: () => void } | null = null;
+  const mockSuccessCheckmark: React.ComponentType<any> = (props: any) => {
+    lastProps = { visible: props.visible, label: props.label, onDismiss: props.onDismiss };
+    return mockReact.createElement(
+      mockReact.Fragment,
+      null,
+      mockReact.createElement('Text', { testID: 'cancel-success-checkmark-label' }, props.label),
+    );
+  };
+  (mockSuccessCheckmark as any).__getLastProps = () => lastProps;
+  return { SuccessCheckmark: mockSuccessCheckmark };
+});
 
 const renderScreen = (composition: ReturnType<typeof buildTestComposition>) =>
   render(
@@ -19,6 +36,14 @@ const renderScreen = (composition: ReturnType<typeof buildTestComposition>) =>
       </CompositionProvider>
     </SafeAreaProvider>,
   );
+
+function getCheckmarkLastProps() {
+  return (SuccessCheckmark as unknown as { __getLastProps: () => unknown }).__getLastProps() as {
+    visible: boolean;
+    label: string;
+    onDismiss: () => void;
+  } | null;
+}
 
 describe('MyBookingsScreen', () => {
   it('shows the literal empty-state message when there are no bookings', async () => {
@@ -53,9 +78,8 @@ describe('MyBookingsScreen', () => {
     expect(composition.store.getSnapshot()?.bookings[0]?.status).toBe('cancelled');
   });
 
-  it('fires a native cancellation notification on success (no in-app overlay)', async () => {
-    const notifications = new InMemoryNotificationsAdapter();
-    const composition = buildTestComposition({ notifications });
+  it('renders the cancellation success feedback as SuccessCheckmark (not a platform Modal)', async () => {
+    const composition = buildTestComposition();
     await composition.initializeBookings.execute();
     const farFuture = composition.store
       .getSnapshot()!
@@ -74,21 +98,18 @@ describe('MyBookingsScreen', () => {
     await act(async () => {
       fireEvent.press(screen.getByText(messages.confirmCancel));
     });
-    // Flush microtasks so the async bookClass → cancel success chain resolves.
-    await act(async () => {
-      await Promise.resolve();
-    });
+    // Wait for the SuccessCheckmark mock to mount (re-render after async cancel).
+    await screen.findByTestId('cancel-success-checkmark-label');
 
-    // The cancellation notification was scheduled exactly once.
-    const scheduled = notifications.getScheduled();
-    expect(scheduled).toHaveLength(1);
-    expect(scheduled[0]).toMatchObject({
-      title: 'ClaseFit',
-      identifier: 'cancel-success',
-    });
-    expect(scheduled[0].body).toBeTruthy();
+    // The cancellation success checkmark should be visible with the FR-05 cancellation message.
+    const checkmarkProps = getCheckmarkLastProps();
+    expect(checkmarkProps).not.toBeNull();
+    expect(checkmarkProps!.visible).toBe(true);
+    // The label should carry the cancellation outcome (not the booking FR-05 literal).
+    expect(checkmarkProps!.label).toBeTruthy();
+    expect(checkmarkProps!.label).not.toBe(messages.success);
 
-    // No legacy "Reserva cancelada" <Modal> in the tree.
+    // No platform Modal from MyBookingsScreen should display the legacy "Reserva cancelada" title.
     expect(screen.queryByText('Reserva cancelada')).toBeNull();
   });
 });
