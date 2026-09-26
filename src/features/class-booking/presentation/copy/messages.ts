@@ -35,6 +35,10 @@ export const messages = {
   bookAction: 'Reservar',
   cancelAction: 'Cancelar',
   reservedTag: 'Reservada',
+
+  successTitle: '¡Listo!',
+  successDefaultMessage: '¡Listo! Tu cupo está reservado',
+  successCta: 'Listo',
 } as const;
 
 export type MessageKey = keyof typeof messages;

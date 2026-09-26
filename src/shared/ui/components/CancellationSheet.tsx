@@ -1,9 +1,8 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { designTokens } from '@shared/ui/tokens';
-import { Pill } from '@shared/ui/components/Pill';
-import { PixelPattern } from '@shared/ui/components/PixelPattern';
-import { messages } from '../copy/messages';
+import { Modal, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Pill } from './Pill';
+import { PixelPattern } from './PixelPattern';
+import { designTokens } from '../tokens';
 
 export interface SessionPreview {
   readonly name: string;
@@ -20,9 +19,13 @@ export interface CancellationSheetProps {
   readonly onConfirm: () => void;
   readonly sessionPreview?: SessionPreview | null;
   readonly children: ReactNode;
+  readonly testID?: string;
 }
 
-type CancellationSheetContextValue = CancellationSheetProps;
+interface CancellationSheetContextValue {
+  readonly onKeep: () => void;
+  readonly onConfirm: () => void;
+}
 
 const Context = createContext<CancellationSheetContextValue | null>(null);
 
@@ -34,20 +37,75 @@ function useSheet(): CancellationSheetContextValue {
   return value;
 }
 
-function Root(props: CancellationSheetProps) {
-  const value = useMemo<CancellationSheetContextValue>(() => ({ ...props }), [props]);
-  if (!props.visible) {
-    return null;
-  }
+function Root({
+  visible,
+  onKeep,
+  onConfirm,
+  sessionPreview,
+  children,
+  testID,
+}: CancellationSheetProps) {
+  const value = useMemo<CancellationSheetContextValue>(
+    () => ({ onKeep, onConfirm }),
+    [onKeep, onConfirm],
+  );
+  return (
+    <Modal
+      transparent
+      animationType="slide"
+      visible={visible}
+      onRequestClose={onKeep}
+      testID={testID}
+    >
+      <CancellationSheetContent
+        onKeep={onKeep}
+        onConfirm={onConfirm}
+        sessionPreview={sessionPreview}
+        testID={testID}
+      >
+        <Context.Provider value={value}>{children}</Context.Provider>
+      </CancellationSheetContent>
+    </Modal>
+  );
+}
+
+export interface CancellationSheetContentProps {
+  readonly onKeep: () => void;
+  readonly onConfirm: () => void;
+  readonly sessionPreview?: SessionPreview | null;
+  readonly children: ReactNode;
+  readonly testID?: string;
+}
+
+/**
+ * Inner content rendered inside the Modal. Exported separately so tests
+ * can render it directly without going through the Modal host (which
+ * jest-expo does not expose to the test renderer).
+ */
+export function CancellationSheetContent({
+  onKeep,
+  onConfirm,
+  sessionPreview,
+  children,
+  testID,
+}: CancellationSheetContentProps) {
+  const value = useMemo<CancellationSheetContextValue>(
+    () => ({ onKeep, onConfirm }),
+    [onKeep, onConfirm],
+  );
   return (
     <Context.Provider value={value}>
-      <View style={styles.overlay} accessibilityViewIsModal>
+      <View style={styles.overlay}>
+        <Pressable
+          style={styles.backdrop}
+          onPress={onKeep}
+          accessibilityLabel="Cerrar"
+          testID={testID ? `${testID}-backdrop` : undefined}
+        />
         <View style={styles.sheet}>
           <View style={styles.dragHandle} />
-          {props.children}
-          {props.sessionPreview ? (
-            <SessionPreviewCard preview={props.sessionPreview} />
-          ) : null}
+          {children}
+          {sessionPreview ? <SessionPreviewCard preview={sessionPreview} /> : null}
         </View>
       </View>
     </Context.Provider>
@@ -55,11 +113,11 @@ function Root(props: CancellationSheetProps) {
 }
 
 function Title() {
-  return <Text style={styles.title}>{messages.cancelPrompt}</Text>;
+  return <Text style={styles.title}>{'¿Cancelar tu reserva?'}</Text>;
 }
 
 function Description() {
-  return <Text style={styles.description}>{messages.cancelDescription}</Text>;
+  return <Text style={styles.description}>{'Tu cupo quedará disponible para otra persona.'}</Text>;
 }
 
 function Actions() {
@@ -67,24 +125,24 @@ function Actions() {
   return (
     <View style={styles.actions}>
       <Pill
-        label={messages.keepBooking}
+        label="Mantener reserva"
         variant="primary"
         onPress={sheet.onKeep}
         accessibilityLabel="Mantener tu reserva actual"
-        style={styles.actionPill}
+        style={styles.actionPill as ViewStyle}
       />
       <Pill
-        label={messages.confirmCancel}
+        label="Sí, cancelar"
         variant="destructive"
         onPress={sheet.onConfirm}
         accessibilityLabel="Confirmar cancelación"
-        style={styles.actionPill}
+        style={styles.actionPill as ViewStyle}
       />
     </View>
   );
 }
 
-function SessionPreviewCard({ preview }: { preview: SessionPreview }) {
+function SessionPreviewCard({ preview }: { readonly preview: SessionPreview }) {
   return (
     <View
       style={[styles.previewCard, { backgroundColor: preview.categoryColor }]}
@@ -115,13 +173,12 @@ export const CancellationSheet = {
 
 const styles = StyleSheet.create({
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFill,
   },
   sheet: {
     backgroundColor: designTokens.color.cardSurface,
@@ -142,11 +199,11 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   title: {
-    fontSize: designTokens.fontSize.display,
+    fontSize: designTokens.fontSize.hero,
     fontWeight: '800',
     color: designTokens.color.textPrimary,
     letterSpacing: -0.6,
-    lineHeight: designTokens.fontSize.display + 2,
+    lineHeight: designTokens.fontSize.hero + 2,
   },
   description: {
     fontSize: designTokens.fontSize.bodyLg,
@@ -167,7 +224,7 @@ const styles = StyleSheet.create({
     fontSize: designTokens.fontSize.title,
     fontWeight: '700',
     color: designTokens.color.textPrimary,
-    letterSpacing: -0.2,
+    letterSpacing: -0.4,
   },
   previewMeta: {
     fontSize: designTokens.fontSize.body,
