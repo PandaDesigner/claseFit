@@ -84,32 +84,19 @@ export function Pill({
     </>
   );
 
-  if (!isInteractive) {
-    return (
-      <View
-        accessibilityRole="text"
-        accessibilityLabel={accessibilityLabel ?? label}
-        testID={testID}
-        style={baseStyle}
-      >
-        {content}
-      </View>
-    );
-  }
-
   return (
     <Pressable
-      accessibilityRole="button"
+      accessibilityRole={isInteractive ? 'button' : 'text'}
+      accessibilityState={{ disabled: !isInteractive }}
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled: false }}
-      disabled={false}
+      disabled={!isInteractive}
       onPress={() => {
         onPress?.();
       }}
       testID={testID}
       style={({ pressed }) => [
         ...baseStyle,
-        pressed ? styles.pressed : null,
+        pressed && isInteractive ? styles.pressed : null,
       ]}
     >
       {content}

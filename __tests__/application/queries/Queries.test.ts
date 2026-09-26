@@ -132,14 +132,27 @@ describe('ListActiveBookings', () => {
   it('returns only active bookings ordered by start', () => {
     const store = new InMemoryBookingStateAdapter();
     store.replaceSnapshot(snapshot());
-    const query = new ListActiveBookings({ store });
+    const query = new ListActiveBookings({ store, clock: new FixedClock(NOW) });
     const bookings = query.execute();
     expect(bookings.map((b) => b.id)).toEqual(['R-01', 'R-02']);
   });
 
   it('returns an empty array when no snapshot is hydrated', () => {
     const store = new InMemoryBookingStateAdapter();
-    const query = new ListActiveBookings({ store });
+    const query = new ListActiveBookings({ store, clock: new FixedClock(NOW) });
     expect(query.execute()).toEqual([]);
+  });
+
+  it('marks a booking cancellable when the session starts in at least 2 hours', () => {
+    const store = new InMemoryBookingStateAdapter();
+    store.replaceSnapshot(snapshot());
+    const query = new ListActiveBookings({ store, clock: new FixedClock(NOW) });
+    const bookings = query.execute();
+    const r01 = bookings.find((b) => b.id === 'R-01');
+    const r02 = bookings.find((b) => b.id === 'R-02');
+    // R-01 session is at the exact current instant — NOT cancellable.
+    expect(r01?.cancellable).toBe(false);
+    // R-02 session is 2 days away — cancellable.
+    expect(r02?.cancellable).toBe(true);
   });
 });
