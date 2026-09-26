@@ -10,7 +10,12 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\" --ignore-path .prettierignore",
+    "setup:review": "gga install"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -30,8 +35,13 @@
     "@types/node": "^26.6.2",
     "@types/react": "~19.2.4",
     "@types/react-test-renderer": "^19.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.70.1",
+    "@typescript-eslint/parser": "^8.70.1",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~57.0.2",
     "jest": "~29.7.0",
     "jest-expo": "~57.0.5",
+    "prettier": "^3.9.9",
     "react-test-renderer": "^19.2.0",
     "typescript": "~6.0.3"
   },
