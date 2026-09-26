@@ -10,9 +10,7 @@ describe('SuccessCheckmark', () => {
   });
 
   it('renders the checkmark glyph while visible', async () => {
-    await render(
-      <SuccessCheckmark visible onDismiss={jest.fn()} label="ok" testID="check" />,
-    );
+    await render(<SuccessCheckmark visible onDismiss={jest.fn()} label="ok" testID="check" />);
     expect(screen.getByTestId('check')).toBeTruthy();
     expect(screen.getByText('✓')).toBeTruthy();
   });
@@ -28,9 +26,7 @@ describe('SuccessCheckmark', () => {
   it('auto-calls onDismiss after durationMs via fake timers', async () => {
     jest.useFakeTimers();
     const onDismiss = jest.fn();
-    await render(
-      <SuccessCheckmark visible onDismiss={onDismiss} label="done" durationMs={100} />,
-    );
+    await render(<SuccessCheckmark visible onDismiss={onDismiss} label="done" durationMs={100} />);
     expect(onDismiss).not.toHaveBeenCalled();
     await act(async () => {
       jest.advanceTimersByTime(150);
@@ -61,9 +57,7 @@ describe('SuccessCheckmark', () => {
     const result = await render(
       <SuccessCheckmark visible onDismiss={onDismiss} label="hide" durationMs={100} />,
     );
-    await result.rerender(
-      <SuccessCheckmark visible={false} onDismiss={onDismiss} label="hide" />,
-    );
+    await result.rerender(<SuccessCheckmark visible={false} onDismiss={onDismiss} label="hide" />);
     await act(async () => {
       jest.advanceTimersByTime(500);
     });

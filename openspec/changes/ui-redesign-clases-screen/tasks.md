@@ -2,12 +2,12 @@
 
 ## Review Workload Forecast
 
-| Field                   | Value                                                            |
-| ----------------------- | ---------------------------------------------------------------- |
-| Estimated changed lines | 700–900 (presentation + shared UI + tests + assets)              |
-| 400-line budget risk    | High (presentation-heavy)                                        |
-| Chained PRs recommended | No — single PR, well-scoped to presentation                       |
-| Delivery strategy       | presentational-only                                              |
+| Field                   | Value                                               |
+| ----------------------- | --------------------------------------------------- |
+| Estimated changed lines | 700–900 (presentation + shared UI + tests + assets) |
+| 400-line budget risk    | High (presentation-heavy)                           |
+| Chained PRs recommended | No — single PR, well-scoped to presentation         |
+| Delivery strategy       | presentational-only                                 |
 
 Decision needed before apply: No
 Chained PRs recommended: No
@@ -16,20 +16,20 @@ Chain strategy: single PR
 
 ## Suggested Work Units (mapped to commits)
 
-| Unit | Goal                                                              | Commit              |
-| ---- | ----------------------------------------------------------------- | ------------------- |
-| 1    | Tooling: jest asset mock + tsconfig deprecation                  | `chore(setup)`      |
-| 2    | Design tokens (pixel palette, fonts, radii, instructor palette, tab bar height) | `feat(shared-ui)` |
-| 3    | Pill component with variants (primary, disabled, success, outline, reserved, destructive) | `feat(shared-ui)` |
-| 4    | Category → asset mapping (sport icons + instructor avatars)       | `feat(shared-ui)`   |
-| 5    | BrandHeader, InstructorAvatar, PixelPattern                       | `feat(shared-ui)`   |
-| 6    | Floating tab bar (FloatingTabBar, TabBarIcons, RootTabs)          | `feat(navigation)`  |
-| 7    | ClassCard with 2-col layout, state-driven button, image-led        | `feat(classes)`     |
-| 8    | UpcomingClassesScreen with day grouping + safe-area bottom        | `feat(classes)`     |
-| 9    | CancellationSheet with session preview card                       | `feat(classes)`     |
-| 10   | MyBookingsScreen with section heading + preview wiring            | `feat(my-bookings)` |
-| 11   | App.tsx SafeAreaProvider                                          | `feat(app)`         |
-| 12   | Test setup: SafeAreaProvider in screen tests                     | `test`              |
+| Unit | Goal                                                                                      | Commit              |
+| ---- | ----------------------------------------------------------------------------------------- | ------------------- |
+| 1    | Tooling: jest asset mock + tsconfig deprecation                                           | `chore(setup)`      |
+| 2    | Design tokens (pixel palette, fonts, radii, instructor palette, tab bar height)           | `feat(shared-ui)`   |
+| 3    | Pill component with variants (primary, disabled, success, outline, reserved, destructive) | `feat(shared-ui)`   |
+| 4    | Category → asset mapping (sport icons + instructor avatars)                               | `feat(shared-ui)`   |
+| 5    | BrandHeader, InstructorAvatar, PixelPattern                                               | `feat(shared-ui)`   |
+| 6    | Floating tab bar (FloatingTabBar, TabBarIcons, RootTabs)                                  | `feat(navigation)`  |
+| 7    | ClassCard with 2-col layout, state-driven button, image-led                               | `feat(classes)`     |
+| 8    | UpcomingClassesScreen with day grouping + safe-area bottom                                | `feat(classes)`     |
+| 9    | CancellationSheet with session preview card                                               | `feat(classes)`     |
+| 10   | MyBookingsScreen with section heading + preview wiring                                    | `feat(my-bookings)` |
+| 11   | App.tsx SafeAreaProvider                                                                  | `feat(app)`         |
+| 12   | Test setup: SafeAreaProvider in screen tests                                              | `test`              |
 
 ## Phase 1: Tooling
 

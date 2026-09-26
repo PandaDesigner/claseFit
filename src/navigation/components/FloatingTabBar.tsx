@@ -25,7 +25,12 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
   return (
     <View
       pointerEvents="box-none"
-      style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, designTokens.spacing.md) + designTokens.spacing.sm }]}
+      style={[
+        styles.wrapper,
+        {
+          paddingBottom: Math.max(insets.bottom, designTokens.spacing.md) + designTokens.spacing.sm,
+        },
+      ]}
     >
       <View style={styles.dock}>
         {state.routes.map((route, index) => {

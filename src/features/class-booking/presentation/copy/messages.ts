@@ -48,7 +48,9 @@ export function instructorEyebrow(gender: 'male' | 'female'): string {
 }
 
 export function seatsLabel(occupied: number, total: number): string {
-  return messages.seatsTemplate.replace('{occupied}', String(occupied)).replace('{total}', String(total));
+  return messages.seatsTemplate
+    .replace('{occupied}', String(occupied))
+    .replace('{total}', String(total));
 }
 
 export function dayLabel(diaOffset: 0 | 1 | 2 | number, date: Date): string {

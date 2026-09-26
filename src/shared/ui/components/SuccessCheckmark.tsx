@@ -101,16 +101,15 @@ export function SuccessCheckmark({
       accessibilityLiveRegion="polite"
       testID={testID}
       pointerEvents="none"
-      style={[
-        styles.wrapper,
-        { opacity, transform: [{ scale }] },
-      ]}
+      style={[styles.wrapper, { opacity, transform: [{ scale }] }]}
     >
       <View style={styles.card}>
         <Text style={styles.glyph} testID={testID ? `${testID}-glyph` : undefined}>
           ✓
         </Text>
-        <Text style={styles.label} testID={testID ? `${testID}-label` : undefined}>{label}</Text>
+        <Text style={styles.label} testID={testID ? `${testID}-label` : undefined}>
+          {label}
+        </Text>
       </View>
     </Animated.View>
   );

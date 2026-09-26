@@ -5,19 +5,13 @@ import { useComposition } from '@features/class-booking/compositionProvider';
 import { useUpcomingSessions } from '@features/class-booking/presentation/hooks/useUpcomingSessions';
 import { useBookingCommands } from '@features/class-booking/presentation/hooks/useBookingCommands';
 import { ClassCard } from '@features/class-booking/presentation/components/ClassCard';
-import {
-  BookingGateSheet,
-  type SessionPreview,
-} from '@shared/ui/components/BookingGateSheet';
+import { BookingGateSheet, type SessionPreview } from '@shared/ui/components/BookingGateSheet';
 import { SuccessCheckmark } from '@shared/ui/components/SuccessCheckmark';
 import { BrandHeader } from '@shared/ui/components/BrandHeader';
 import { FadeInOnView } from '@shared/ui/components/FadeInOnView';
 import { designTokens } from '@shared/ui/tokens';
 import { categoryColor } from '@shared/ui/categoryAssets';
-import {
-  dayLabel,
-  messages,
-} from '@features/class-booking/presentation/copy/messages';
+import { dayLabel, messages } from '@features/class-booking/presentation/copy/messages';
 import type { UpcomingSessionView } from '@features/class-booking/application/queries/ListUpcomingSessions';
 
 interface DaySection {
@@ -37,7 +31,8 @@ function computeDiaOffset(now: Date, sessionStart: Date): 0 | 1 | 2 | 3 | 4 | 5 
     sessionStart.getDate(),
   ).getTime();
   const diffMs = startOfSession - startOfNow;
-  return Math.max(0, Math.min(6, Math.round(diffMs / (24 * 60 * 60 * 1000)))) as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  return Math.max(0, Math.min(6, Math.round(diffMs / (24 * 60 * 60 * 1000)))) as
+    0 | 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 function groupSessionsByDay(

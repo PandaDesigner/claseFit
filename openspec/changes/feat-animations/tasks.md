@@ -2,12 +2,12 @@
 
 ## Review Workload Forecast
 
-| Field                   | Value                                |
-| ----------------------- | ------------------------------------ |
+| Field                   | Value                                                      |
+| ----------------------- | ---------------------------------------------------------- |
 | Estimated changed lines | 80–120 (3 files, mostly styles + a small `Animated` block) |
-| 400-line budget risk    | None                                 |
-| Chained PRs recommended | No                                   |
-| Delivery strategy       | UX-only                              |
+| 400-line budget risk    | None                                                       |
+| Chained PRs recommended | No                                                         |
+| Delivery strategy       | UX-only                                                    |
 
 Decision needed before apply: No
 Chained PRs recommended: No
@@ -16,12 +16,12 @@ Chain strategy: single PR
 
 ## Suggested Work Units (mapped to commits)
 
-| Unit | Goal                                                              | Commit              |
-| ---- | ----------------------------------------------------------------- | ------------------- |
-| 1    | Pill press scale (`transform: scale(0.97)` on press)              | `feat(ux)`          |
-| 2    | BrandHeader fade + slide-in on mount (`Animated.timing`)          | `feat(ux)`          |
-| 3    | Day section headers fade in (`Animated.View` + `onLayout`)          | `feat(ux)`          |
-| 4    | OpenSpec change artifacts                                         | `docs(openspec)`    |
+| Unit | Goal                                                       | Commit           |
+| ---- | ---------------------------------------------------------- | ---------------- |
+| 1    | Pill press scale (`transform: scale(0.97)` on press)       | `feat(ux)`       |
+| 2    | BrandHeader fade + slide-in on mount (`Animated.timing`)   | `feat(ux)`       |
+| 3    | Day section headers fade in (`Animated.View` + `onLayout`) | `feat(ux)`       |
+| 4    | OpenSpec change artifacts                                  | `docs(openspec)` |
 
 ## Phase 1: Pill press scale
 

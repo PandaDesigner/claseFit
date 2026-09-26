@@ -1,8 +1,11 @@
 # booking-success-notification Specification
 
 ## Purpose
+
 TBD - created by archiving change feat-booking-confirmation-gate. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Booking success fires a native local notification with the FR-05 literal
 
 After a successful `BookClass.execute`, the `NotificationsService.scheduleBookingSuccess` port SHALL be invoked exactly once. The adapter SHALL schedule a native local notification with title `ClaseFit` and body `¡Listo! Tu cupo está reservado`. The notification SHALL fire within a few seconds of scheduling (via a 5-second `TIME_INTERVAL` trigger).
@@ -49,4 +52,3 @@ The `NotificationsService` port SHALL be invoked from the presentation-layer com
 - **AND** then switches to the `Clases` tab
 - **THEN** the booking notification SHALL still appear in the OS notification center
 - **AND** no component on `Mis reservas` SHALL re-render to "show" the notification (there is no in-app overlay).
-

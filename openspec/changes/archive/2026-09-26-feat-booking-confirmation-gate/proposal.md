@@ -31,13 +31,13 @@ After the previous changes in this proposal replaced both modal-based feedbacks 
 
 - **`package.json`**: add `expo-notifications@~57.0.21`.
 - **`app.json`**: add the `notification` plugin config (icon, color) — `expo-notifications` autolinks via Expo SDK 57.
-- **`src/features/class-booking/application/ports/NotificationsService.ts`** *(new)*: port with `requestPermissions(): Promise<boolean>` + `scheduleBookingSuccess(): Promise<void>` + `scheduleCancellationSuccess(message: string): Promise<void>`.
-- **`src/features/class-booking/infrastructure/notifications/ExpoNotificationsAdapter.ts`** *(new)*: implements the port via `expo-notifications` `scheduleNotificationAsync` with a 5-second trigger (so the notification fires immediately). Title `messages.brandWordmark` ("ClaseFit"), body from the message, identifier `"booking-success"` or `"cancel-success"`.
-- **`src/features/class-booking/infrastructure/notifications/InMemoryNotificationsAdapter.ts`** *(new)*: test double that records every notification request.
+- **`src/features/class-booking/application/ports/NotificationsService.ts`** _(new)_: port with `requestPermissions(): Promise<boolean>` + `scheduleBookingSuccess(): Promise<void>` + `scheduleCancellationSuccess(message: string): Promise<void>`.
+- **`src/features/class-booking/infrastructure/notifications/ExpoNotificationsAdapter.ts`** _(new)_: implements the port via `expo-notifications` `scheduleNotificationAsync` with a 5-second trigger (so the notification fires immediately). Title `messages.brandWordmark` ("ClaseFit"), body from the message, identifier `"booking-success"` or `"cancel-success"`.
+- **`src/features/class-booking/infrastructure/notifications/InMemoryNotificationsAdapter.ts`** _(new)_: test double that records every notification request.
 - **`src/features/class-booking/composition.ts`**: add the `notifications: NotificationsService` field to `Composition`; wire `ExpoNotificationsAdapter` in `buildProductionComposition` and `InMemoryNotificationsAdapter` in `buildTestComposition`.
 - **`src/features/class-booking/presentation/hooks/useBookingCommands.ts`**: accept the port as a third dependency; call `notifications.scheduleBookingSuccess()` when `book` resolves with `status: 'success'`; call `notifications.scheduleCancellationSuccess(result.message)` when `cancel` resolves with `status: 'success'`.
-- **`src/shared/ui/components/SuccessCheckmark.tsx`** *(delete)*: the in-app overlay is no longer needed — its job is now done by the native push notification.
-- **`__tests__/presentation/SuccessCheckmark.test.tsx`** *(delete)*.
+- **`src/shared/ui/components/SuccessCheckmark.tsx`** _(delete)_: the in-app overlay is no longer needed — its job is now done by the native push notification.
+- **`__tests__/presentation/SuccessCheckmark.test.tsx`** _(delete)_.
 - **`src/features/class-booking/presentation/screens/UpcomingClassesScreen.tsx`**: drop the `confirmedSessionId` state + `<SuccessCheckmark>` render. The `useBookingCommands` hook now handles the notification.
 - **`src/features/class-booking/presentation/screens/MyBookingsScreen.tsx`**: drop the `cancelFeedback` state + `<SuccessCheckmark>` render. The `useBookingCommands` hook now handles the notification.
 - **`__tests__/presentation/screens/UpcomingClassesScreen.test.tsx`**: replace the "FR-05 literal appears exactly once" assertion with "the notifications port received `scheduleBookingSuccess` exactly once after confirm". Assert the in-app overlay (FR-05 literal) is no longer in the tree.

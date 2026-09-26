@@ -67,5 +67,5 @@ FR-06 (empty):     "Aún no tienes reservas"
 ## Style
 
 - TypeScript strict. No `any`, no `as` casts except at asset-require boundaries.
-- Tests: 19 suites, 75 tests. Every change must keep them green.
+- Tests: 21 suites, 96 tests. Every change must keep them green.
 - `pnpm typecheck`, `pnpm lint` (0 warnings), `pnpm test`, `npx expo export --platform android` must all pass.

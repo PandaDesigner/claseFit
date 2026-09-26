@@ -3,6 +3,7 @@
 The redesigned screens (PR #1 Clases, PR #3 Mis reservas) ship with crisp visual hierarchy but no tactile feedback. CTAs feel flat — pressing a `Reservar` or `Cancelar` Pill produces only an opacity change (0.85) that the eye barely registers on a bright pastel card. The brand header pops in instantly on cold start with no transition.
 
 Small motion lifts the product from "looks designed" to "feels designed":
+
 - Pills compress slightly on press (scale 0.97) — universal affordance for tappable surfaces.
 - The brand header fades + slides in on first paint — sets the brand surface, not the screen body.
 - Day section headers ease in as the user scrolls past them — reinforces the day grouping introduced in the Clases and Mis reservas redesigns.

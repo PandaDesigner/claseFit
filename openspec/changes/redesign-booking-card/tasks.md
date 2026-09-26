@@ -2,12 +2,12 @@
 
 ## Review Workload Forecast
 
-| Field                   | Value                                              |
-| ----------------------- | -------------------------------------------------- |
+| Field                   | Value                                                        |
+| ----------------------- | ------------------------------------------------------------ |
 | Estimated changed lines | 250–350 (presentation only — 1 component + 1 screen rewrite) |
-| 400-line budget risk    | Low                                                |
-| Chained PRs recommended | No — single PR, well-scoped                        |
-| Delivery strategy       | presentational-only                                |
+| 400-line budget risk    | Low                                                          |
+| Chained PRs recommended | No — single PR, well-scoped                                  |
+| Delivery strategy       | presentational-only                                          |
 
 Decision needed before apply: No
 Chained PRs recommended: No
@@ -16,11 +16,11 @@ Chain strategy: single PR
 
 ## Suggested Work Units (mapped to commits)
 
-| Unit | Goal                                                              | Commit              |
-| ---- | ----------------------------------------------------------------- | ------------------- |
+| Unit | Goal                                                                                                                                                         | Commit              |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- |
 | 1    | Rewrite `BookingCard` to match `ClassCard` archetype (2-col, pastel bg, PixelPattern, InstructorAvatar, sport-icon cutout, destructive Pill at bottom-right) | `feat(my-bookings)` |
-| 2    | Update `MyBookingsScreen` (drop inner heading, add BrandHeader + greeting, SectionList grouped by day, safe-area bottom padding) | `feat(my-bookings)` |
-| 3    | OpenSpec change artifacts for traceability                         | `docs(openspec)`    |
+| 2    | Update `MyBookingsScreen` (drop inner heading, add BrandHeader + greeting, SectionList grouped by day, safe-area bottom padding)                             | `feat(my-bookings)` |
+| 3    | OpenSpec change artifacts for traceability                                                                                                                   | `docs(openspec)`    |
 
 ## Phase 1: BookingCard
 
