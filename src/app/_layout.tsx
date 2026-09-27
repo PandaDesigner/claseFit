@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Slot } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { buildProductionComposition, type Composition } from '@features/class-booking/composition';
 import { CompositionProvider } from '@features/class-booking/compositionProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FloatingTabBar } from './_components/tabs/FloatingTabBar';
 
 /**
  * RootLayout is the only place that builds the production composition.
@@ -12,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * Lifecycle:
  *  1. On mount, the composition object is built synchronously inside the
  *     useState initializer and stored in state. As soon as the first render
- *     commits, the route tree (Slot) is rendered inside <CompositionProvider>,
+ *     commits, the route tree (Tabs) is rendered inside <CompositionProvider>,
  *     so feature screens can call useComposition() immediately.
  *  2. `initializeBookings.execute()` runs in the background (fire-and-forget)
  *     to hydrate the AsyncStorage snapshot. A failure is logged but does NOT
@@ -47,7 +48,25 @@ export default function RootLayout(): React.ReactElement {
   return (
     <SafeAreaProvider>
       <CompositionProvider composition={composition}>
-        <Slot />
+        <Tabs
+          tabBar={(props) => <FloatingTabBar {...props} />}
+          screenOptions={{ headerShown: false }}
+        >
+          <Tabs.Screen
+            name="(proximas)"
+            options={{
+              title: 'Clases',
+              tabBarAccessibilityLabel: 'Clases',
+            }}
+          />
+          <Tabs.Screen
+            name="(reservas)"
+            options={{
+              title: 'Mis reservas',
+              tabBarAccessibilityLabel: 'Mis reservas',
+            }}
+          />
+        </Tabs>
       </CompositionProvider>
     </SafeAreaProvider>
   );
