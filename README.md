@@ -170,20 +170,24 @@ The latest signed `preview` APK (Android) is built via EAS. Scan the QR with you
 
 ![Scan to download the ClaseFit preview APK](./assets/preview-apk-qr.png)
 
-- **APK direct download**: <https://expo.dev/artifacts/eas/Sh-zQ0JQGsDoemTtfI-kN_FsUDVYPRcMhKQ9SnZUbU0.apk>
-- **EAS build page** (with logs + alternate install options): <https://expo.dev/accounts/panda-designer/projects/clasefit/builds/2d84bc69-45a2-4b33-bb6b-c041f012cb5e>
+- **APK direct download**: <https://expo.dev/artifacts/eas/Sg2bdLFaUlS0kLkw9PzoGX-VJHG_tRJ8d8om6L36tjc.apk>
+- **EAS build page** (with logs + alternate install options): <https://expo.dev/accounts/panda-designer/projects/clasefit/builds/fa7c125e-928e-4020-96be-ded879fe40df>
 
 Sideload onto a connected device:
 
 ```bash
-adb install -r https://expo.dev/artifacts/eas/Sh-zQ0JQGsDoemTtfI-kN_FsUDVYPRcMhKQ9SnZUbU0.apk
+adb install -r https://expo.dev/artifacts/eas/Sg2bdLFaUlS0kLkw9PzoGX-VJHG_tRJ8d8om6L36tjc.apk
 ```
 
 You may need to enable **Install unknown apps** for your browser or `adb` source in Android settings. The bundle id is `com.pandadesigner.clasefit`.
 
-> **Freshness note (2026-09-26)**: the URLs above point at the last signed
-> `preview` APK produced by EAS for this project. EAS artifacts expire and
-> rotate; before sharing externally, re-run `eas build -p android --profile preview`
-> and update the links if needed. The remaining blockers for store
+> **Freshness note (2026-09-27)**: the URLs and the QR above point at the
+> latest signed `preview` APK for this project — build
+> `fa7c125e-928e-4020-96be-ded879fe40df` (commit `67a4d76a`, app version
+> `1.0.0` build `1`, SDK 57). EAS artifacts expire after ~14 days and
+> rotate; before sharing externally, re-run
+> `eas build -p android --profile preview` and update both the URLs and
+> `assets/preview-apk-qr.png` if needed. The remaining blockers for store
 > publication (Play Console / Apple Developer / privacy / listing) are
-> tracked in `docs/checklist_release.md`.
+> tracked in `docs/checklist_release.md`. To regenerate the QR:
+> `npx -y qrcode -o assets/preview-apk-qr.png -s 10 "<apk-url>"`.
