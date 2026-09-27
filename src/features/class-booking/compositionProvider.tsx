@@ -3,10 +3,6 @@ import type { Composition } from '@features/class-booking/composition';
 
 const CompositionContext = createContext<Composition | null>(null);
 
-// Exported for tests that need to assert the context boundary directly.
-// Production code must use the useComposition() hook, not the raw context.
-export { CompositionContext as __CompositionContextForTests };
-
 export interface CompositionProviderProps {
   readonly composition: Composition;
   readonly children: ReactNode;
