@@ -2,21 +2,20 @@
 
 ### Requirement: App boots through an expo-router file-based tree
 
-The application SHALL mount its UI through an `expo-router` file-based routing tree located at `src/app/`. The root layout file `src/app/_layout.tsx` SHALL be the only component that builds the production `Composition` (calling `buildProductionComposition`) and SHALL render `<CompositionProvider>` plus `<SafeAreaProvider>` exactly once around the routed children. The root layout MUST run `initializeBookings.execute()` before any routed screen mounts; until hydration finishes the root layout SHALL render a single centered `<ActivityIndicator />` (no `RootTabs`, no `NavigationContainer`).
+The application SHALL mount its UI through an `expo-router` file-based routing tree located at `src/app/`. The root layout file `src/app/_layout.tsx` SHALL be the only component that builds the production `Composition` (calling `buildProductionComposition`) and SHALL render `<CompositionProvider>` plus `<SafeAreaProvider>` exactly once around the routed children. The composition object MUST be built synchronously on first render (via a `useState` initializer) so the routed children mount immediately. `initializeBookings.execute()` MUST be triggered in the background (fire-and-forget) on mount; the rendering of routed children MUST NOT be blocked on its resolution. A failure of `initializeBookings.execute()` MUST be swallowed and surfaced by the feature layer; it MUST NOT unmount the root layout.
 
-#### Scenario: First-launch hydration blocks the router
+#### Scenario: First-launch mount happens immediately
 
 - **WHEN** the application starts and AsyncStorage has no persisted snapshot
-- **THEN** the system SHALL display a centered loading indicator
-- **AND** the routed children SHALL NOT be rendered before `initializeBookings.execute()` resolves
-- **AND** once hydration resolves, the system SHALL render the routed children wrapped in `<CompositionProvider>` and `<SafeAreaProvider>`.
+- **THEN** the system SHALL render the routed children on first render, wrapped in `<CompositionProvider>` and `<SafeAreaProvider>`
+- **AND** `initializeBookings.execute()` SHALL run in the background without blocking the first render.
 
-#### Scenario: Hydration error keeps the loading state
+#### Scenario: Persistence failure does not block mount
 
 - **WHEN** `initializeBookings.execute()` rejects with a recoverable error
-- **THEN** the system SHALL keep the loading indicator visible
-- **AND** the routed children SHALL NOT be rendered
-- **AND** the same error SHALL be reachable from the existing recovery flow without crashing the root layout.
+- **THEN** the routed children SHALL remain mounted
+- **AND** the error SHALL be reachable from the existing feature recovery flow without crashing the root layout
+- **AND** the root layout SHALL keep rendering the routed children.
 
 ### Requirement: The app exposes two top-level tabs via NativeTabs
 
@@ -124,9 +123,9 @@ The packages `@react-navigation/native`, `@react-navigation/bottom-tabs`, and an
 
 ### Requirement: Routing change preserves existing test suite
 
-The change MUST keep all existing tests green (96 tests across 21 suites) and MUST NOT modify any test under `src/features/class-booking/`. Two new render tests are added in `src/app/__tests__/`:
+The change MUST keep all existing tests green (96 tests across 21 suites) and MUST NOT modify any test under `src/features/class-booking/`. New render tests are added in `src/app/__tests__/`:
 
-- `RootLayout.test.tsx` — asserts the root layout renders the loading indicator before hydration resolves and renders the routed children after hydration.
+- `RootLayout.test.tsx` — asserts the root layout (1) calls `buildProductionComposition` exactly once with `AsyncStorage`-shaped storage, (2) mounts the route tree on first render, (3) keeps the route tree mounted when `initializeBookings` rejects, (4) fires `initializeBookings.execute()` in the background, and (5) exposes the composition value through the `CompositionProvider` context boundary.
 - `ClaseDetail.test.tsx` — asserts the placeholder reads `claseId` from `useLocalSearchParams` and renders it verbatim.
 
 Domain, application, and infrastructure tests SHALL remain untouched.
@@ -134,7 +133,7 @@ Domain, application, and infrastructure tests SHALL remain untouched.
 #### Scenario: Full test suite remains green
 
 - **WHEN** `pnpm test` runs after the change
-- **THEN** the suite SHALL report all 96 prior tests passing plus the two new render tests passing
+- **THEN** the suite SHALL report all 96 prior tests passing plus the new render tests passing
 - **AND** no test file under `src/features/class-booking/` SHALL be modified by this change.
 
 #### Scenario: Quality gates pass
