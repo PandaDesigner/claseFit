@@ -1,2 +1,3 @@
-// Placeholder — replaced in Phase 4 with the feature screen re-export.
-export { UpcomingClassesScreen as default } from '@features/class-booking/presentation/screens/UpcomingClassesScreen';
+// Routing layer — thin re-export of the feature screen. The presentation layer
+// owns the screen; the router only mounts it under the (proximas) tab.
+export { UpcomingClassesScreen } from '@features/class-booking/presentation/screens/UpcomingClassesScreen';
