@@ -13,6 +13,9 @@ export default function App() {
     const instance = buildProductionComposition({ storage: AsyncStorage });
     void (async () => {
       try {
+        // TEMP: clear stale snapshot persisted from a previous run with
+        // outdated baseDateBogota. Remove this line after the Tuesday demo.
+        await AsyncStorage.clear();
         await instance.initializeBookings.execute();
       } finally {
         setComposition(instance);
