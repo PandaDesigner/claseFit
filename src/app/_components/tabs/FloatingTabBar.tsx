@@ -11,8 +11,8 @@ interface TabConfig {
 }
 
 const TAB_CONFIG: readonly TabConfig[] = [
-  { routeName: 'proximas', label: 'Clases', Icon: BarbellIcon },
-  { routeName: 'reservas', label: 'Mis reservas', Icon: ClipboardIcon },
+  { routeName: '(proximas)', label: 'Clases', Icon: BarbellIcon },
+  { routeName: '(reservas)', label: 'Mis reservas', Icon: ClipboardIcon },
 ];
 
 const ACTIVE_COLOR = '#FFFFFF';
