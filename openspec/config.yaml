@@ -178,7 +178,7 @@ rules:
     - 'Link PRD/RFC; do not duplicate content.'
 
   tasks:
-    - 'Each behavior follows RED → GREEN → REFACTOR before being marked complete.'
+    - 'Each behavior follows RED → GREEN → REFACTOR before completion.'
     - 'Concrete file paths; never vague descriptions.'
     - 'Each task references at least one spec scenario.'
     - 'Small tasks, independently verifiable.'
