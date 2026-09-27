@@ -1,9 +1,11 @@
-// Phase 2 — RootLayout: composition boundary + CompositionProvider + Slot mount.
+// Phase 2/3 — RootLayout: composition boundary + CompositionProvider + Tabs mount.
 // Verifies the architecture invariant: _layout.tsx is the only place that
 // builds the production composition; feature screens consume useComposition().
 // The composition is built synchronously inside a useState initializer so the
 // route tree mounts on first render; initializeBookings runs fire-and-forget
-// in the background.
+// in the background. Tabs owns the bottom-tab surface; both Tabs.Screen
+// children are mounted.
+import type { ReactNode } from 'react';
 import { useContext } from 'react';
 import { Text } from 'react-native';
 import { render, waitFor } from '@testing-library/react-native';
@@ -26,7 +28,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 
 // react-native-safe-area-context needs native frame metrics to render its
 // children in jest-expo. Mock the surface area the SUT uses to plain
-// pass-through so test queries can traverse into Slot/CompositionProvider.
+// pass-through so test queries can traverse into Tabs/CompositionProvider.
 jest.mock('react-native-safe-area-context', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require('react');
@@ -44,22 +46,42 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
-// Mock expo-router so that <Slot/> renders a Text with a known testID. This
-// lets us assert that the SUT has reached the hydrated branch without
-// depending on SafeAreaProvider/testID traversal quirks of jest-expo.
+// Mock expo-router so the route tree is observable. Tabs renders a marker View
+// and exposes its name + child count through testIDs. Tabs.Screen renders a
+// marker Text with the screen name so we can assert both tabs are mounted.
 jest.mock('expo-router', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactLib = require('react');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Text: MockText } = require('react-native');
+  const { Text: MockText, View: MockView } = require('react-native');
+  const Screen = ({ name }: { name: string }) =>
+    ReactLib.createElement(MockText, { testID: `tab-screen-${name}` }, name);
+  const TabsRoot = ({
+    children,
+    tabBar,
+  }: {
+    children: ReactNode;
+    tabBar?: (props: unknown) => ReactNode;
+  }) =>
+    ReactLib.createElement(
+      MockView,
+      { testID: 'tabs-root' },
+      children,
+      tabBar
+        ? ReactLib.createElement(
+            MockView,
+            { testID: 'tabs-custom-bar' },
+            ReactLib.createElement(MockText, { testID: 'tab-bar-rendered' }, 'tab-bar'),
+          )
+        : null,
+    );
+  // expo-router exposes Tabs.Screen as a static property on the component.
+  TabsRoot.Screen = Screen;
   return {
     __esModule: true,
+    Tabs: TabsRoot,
     Slot: () =>
-      ReactLib.createElement(
-        MockText,
-        { testID: 'route-tree-marker' },
-        'route-tree-mounted',
-      ),
+      ReactLib.createElement(MockText, { testID: 'route-tree-marker' }, 'slot'),
   };
 });
 
@@ -104,12 +126,21 @@ describe('RootLayout (app shell)', () => {
     });
   });
 
-  it('mounts the route tree on first render (composition is built synchronously)', async () => {
-    const { findByTestId } = await render(<RootLayout />);
-    expect(await findByTestId('route-tree-marker')).toBeTruthy();
+  it('mounts the Tabs surface on first render (composition is built synchronously)', async () => {
+    const { findByTestId, findAllByTestId } = await render(<RootLayout />);
+    expect(await findByTestId('tabs-root')).toBeTruthy();
+    expect(await findByTestId('tab-bar-rendered')).toBeTruthy();
+    const screens = await findAllByTestId(/^tab-screen-/);
+    expect(screens).toHaveLength(2);
   });
 
-  it('still mounts the route tree when initializeBookings rejects (failure must not block mount)', async () => {
+  it('mounts both tab screens (proximas) and (reservas)', async () => {
+    const { findByTestId } = await render(<RootLayout />);
+    expect(await findByTestId('tab-screen-(proximas)')).toBeTruthy();
+    expect(await findByTestId('tab-screen-(reservas)')).toBeTruthy();
+  });
+
+  it('still mounts the Tabs surface when initializeBookings rejects (failure must not block mount)', async () => {
     mockCompositionFactory.mockReturnValue({
       ...stubComposition,
       initializeBookings: {
@@ -118,7 +149,7 @@ describe('RootLayout (app shell)', () => {
     });
 
     const { findByTestId } = await render(<RootLayout />);
-    expect(await findByTestId('route-tree-marker')).toBeTruthy();
+    expect(await findByTestId('tabs-root')).toBeTruthy();
   });
 
   it('kicks off initializeBookings.execute in the background on mount', async () => {

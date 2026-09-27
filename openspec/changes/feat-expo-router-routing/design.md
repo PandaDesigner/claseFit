@@ -16,9 +16,9 @@ The hexagonal dependency rule (`presentation → application → domain`) and th
 **Goals**
 
 - Replace `App.tsx` + `src/navigation/RootTabs.tsx` + `FloatingTabBar.tsx` + `TabBarIcons.tsx` with an `expo-router` file-based tree at `src/app/`.
-- Mount a `<NativeTabs>` root with two tabs (`(proximas)`, `(reservas)`) that re-export the existing feature screens.
+- Mount a `<Tabs>` root with two tabs (`(proximas)`, `(reservas)`) that re-export the existing feature screens.
 - Register `expo-router` as the Expo entry by exporting `RootLayout` from `src/app/_layout.tsx` through the existing `index.ts`.
-- Preserve the floating tab bar visual identity (black pill, bottom safe-area inset, active-tab highlight) by re-implementing the same `View` composition inside the `NativeTabs` `tabBar` slot.
+- Preserve the floating tab bar visual identity (black pill, bottom safe-area inset, active-tab highlight) by re-implementing the same `View` composition inside the `<Tabs>` `tabBar` slot.
 - Prepare two dynamic route placeholders (`(proximas)/clase/[claseId].tsx`, `(reservas)/reserva/[reservaId].tsx`) that render only the dynamic param.
 - Register the URL scheme `clasefit` in `app.json` so deep links resolve.
 - Remove `@react-navigation/native`, `@react-navigation/bottom-tabs`, and related types from `package.json`.
@@ -53,17 +53,19 @@ The router tree lives at `src/app/` (not `./app/` at the repo root) so:
 
 The Expo entry stays the same: `index.ts` continues to `registerRootComponent(App)`, but `App` now re-exports `RootLayout` from `src/app/_layout.tsx`. This keeps `expo export --platform android` working without changing the public entry surface.
 
-### D3 — `<NativeTabs>` root, not `<Stack>` + manual tabs
+### D3 — `<Tabs>` root (expo-router v4), not `<Stack>` + manual tabs
 
-`<NativeTabs>` ships native-feeling bottom tabs on iOS/Android and accepts a `tabBar` slot for custom rendering. We use it because:
+`<Tabs>` from `expo-router` (v4) is the supported bottom-tab navigator; it wraps `@react-navigation/bottom-tabs`. We use it because:
 
 - it removes the need for a manual `<NavigationContainer>`;
 - the floating tab bar fits inside `tabBar` as a styled `View` with the same metrics as the old `FloatingTabBar`;
-- it gives a native headerless tab surface that matches the existing UX (no header above the lists, custom floating bar below).
+- it gives a headerless tab surface that matches the existing UX (no header above the lists, custom floating bar below).
+
+Note: `expo-router` v4 does NOT ship a stable `<NativeTabs>` export; `unstable-native-tabs` is unavailable on the installed 4.0.22 line. `<Tabs>` is the supported path for bottom-tab navigation in this SDK.
 
 **Alternatives considered**
 
-- `<Tabs>` (web-style). Rejected: looks wrong on mobile.
+- `<Tabs>` (web-style). Selected — the wrapper around `@react-navigation/bottom-tabs` in v4 is the supported path.
 - `<Stack>` with manual tab implementation. Rejected: more code, same UX, no upside.
 
 ### D4 — Routing boundary: `src/app/` is re-exports and layouts only
@@ -71,7 +73,7 @@ The Expo entry stays the same: `index.ts` continues to `registerRootComponent(Ap
 To enforce the hexagonal rule and the new "routing thin" principle, every file under `src/app/` is restricted to:
 
 - provider composition (`SafeAreaProvider`, `CompositionProvider`, hydration `useEffect`);
-- `<NativeTabs>`, `<Stack>`, `<Tabs.Trigger>`;
+- `<Tabs>`, `<Stack>`, `<Tabs.Trigger>`;
 - `<Link>`, `useRouter`, `useLocalSearchParams`;
 - `export { X } from '<concrete path>'` for the two index files.
 
@@ -102,7 +104,7 @@ This is enforced by code review (GGA) and by `pnpm lint` rules — no new ESLint
 
 ### D8 — Floating tab bar visuals re-implemented inline
 
-The old `src/navigation/components/FloatingTabBar.tsx` and `TabBarIcons.tsx` are deleted; their visual identity is rebuilt inside the `NativeTabs` `tabBar` slot as a styled `View` + two inline `View`-based icons (no SVG library). The colors, radius, padding, and safe-area math are byte-equivalent to the original implementation, satisfying the "design is untouchable" rule.
+The old `src/navigation/components/FloatingTabBar.tsx` and `TabBarIcons.tsx` are deleted; their visual identity is rebuilt inside the `<Tabs>` `tabBar` slot as a styled `View` + two inline `View`-based icons (no SVG library). The colors, radius, padding, and safe-area math are byte-equivalent to the original implementation, satisfying the "design is untouchable" rule.
 
 ### D9 — TDD with red tests for routing behaviors
 
