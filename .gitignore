@@ -78,4 +78,4 @@ coverage/
 .idea/
 *.swp
 *.swo
-.vscode/          # tracked manually if you want shared settings.eas/workflows/claseFit.code-workspace
+.vscode/          # tracked manually if you want shared settings
