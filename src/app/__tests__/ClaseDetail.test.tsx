@@ -20,7 +20,7 @@ jest.mock('expo-router', () => {
 
 // The SUT must be required AFTER the jest.mock() declarations above.
 // eslint-disable-next-line import/first
-import ClaseDetailPlaceholder from '../(proximas)/clase/[claseId]';
+import ClaseDetailPlaceholder from '../(tabs)/proximas/clase/[claseId]';
 
 describe('ClaseDetailPlaceholder', () => {
   it('renders the dynamic claseId param verbatim', async () => {

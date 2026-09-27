@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 import { buildProductionComposition, type Composition } from '@features/class-booking/composition';
 import { CompositionProvider } from '@features/class-booking/compositionProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FloatingTabBar } from './_components/tabs/FloatingTabBar';
 
 /**
  * RootLayout is the only place that builds the production composition.
@@ -13,8 +12,9 @@ import { FloatingTabBar } from './_components/tabs/FloatingTabBar';
  * Lifecycle:
  *  1. On mount, the composition object is built synchronously inside the
  *     useState initializer and stored in state. As soon as the first render
- *     commits, the route tree (Tabs) is rendered inside <CompositionProvider>,
- *     so feature screens can call useComposition() immediately.
+ *     commits, the route tree (Stack → (tabs) group → Tabs) is rendered inside
+ *     <CompositionProvider>, so feature screens can call useComposition()
+ *     immediately.
  *  2. `initializeBookings.execute()` runs in the background (fire-and-forget)
  *     to hydrate the AsyncStorage snapshot. A failure is logged but does NOT
  *     block mount — the feature layer is responsible for surfacing it and
@@ -22,6 +22,12 @@ import { FloatingTabBar } from './_components/tabs/FloatingTabBar';
  *
  * The composition is built exactly once because the useState initializer runs
  * only on the first render.
+ *
+ * Note: this layout does NOT own the bottom tab bar. The Tabs surface lives
+ * in `src/app/(tabs)/_layout.tsx` (the canonical expo-router v4 pattern: a
+ * single `(tabs)` group with one route per tab). Sibling groups at the same
+ * level both resolving to URL `/` confuse expo-router v4 ("No filename found"),
+ * so all tabbed screens live under `(tabs)`.
  */
 export default function RootLayout(): React.ReactElement {
   const [composition] = useState<Composition>(() => {
@@ -48,25 +54,7 @@ export default function RootLayout(): React.ReactElement {
   return (
     <SafeAreaProvider>
       <CompositionProvider composition={composition}>
-        <Tabs
-          tabBar={(props) => <FloatingTabBar {...props} />}
-          screenOptions={{ headerShown: false }}
-        >
-          <Tabs.Screen
-            name="(proximas)"
-            options={{
-              title: 'Clases',
-              tabBarAccessibilityLabel: 'Clases',
-            }}
-          />
-          <Tabs.Screen
-            name="(reservas)"
-            options={{
-              title: 'Mis reservas',
-              tabBarAccessibilityLabel: 'Mis reservas',
-            }}
-          />
-        </Tabs>
+        <Stack screenOptions={{ headerShown: false }} />
       </CompositionProvider>
     </SafeAreaProvider>
   );
