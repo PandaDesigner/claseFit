@@ -6,7 +6,7 @@ describe('composition (in-memory test wiring)', () => {
     await composition.initializeBookings.execute();
     const snapshot = composition.store.getSnapshot();
     expect(snapshot).not.toBeNull();
-    expect(snapshot?.resolvedSessions).toHaveLength(10);
+    expect(snapshot?.resolvedSessions).toHaveLength(13);
   });
 
   it('books a session and publishes through the same store', async () => {
