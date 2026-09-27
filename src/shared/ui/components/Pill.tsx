@@ -15,41 +15,38 @@ export interface PillProps {
   readonly accessibilityLabel?: string;
 }
 
+const variantBackgrounds = new Map<PillVariant, string>([
+  ['primary', designTokens.color.actionPrimary],
+  ['disabled', designTokens.color.actionDisabled],
+  ['success', designTokens.color.successText],
+  ['outline', 'transparent'],
+  ['reserved', designTokens.color.successText],
+  ['destructive', designTokens.color.destructiveSurface],
+]);
+
+const variantTextColors = new Map<PillVariant, string>([
+  ['primary', '#FFFFFF'],
+  ['disabled', '#FFFFFF'],
+  ['success', designTokens.color.successSurface],
+  ['reserved', designTokens.color.successSurface],
+  ['outline', designTokens.color.textPrimary],
+  ['destructive', designTokens.color.destructiveText],
+]);
+
+const variantBorders = new Map<PillVariant, string>([
+  ['outline', designTokens.color.textPrimary],
+]);
+
 function variantBackground(variant: PillVariant): string {
-  switch (variant) {
-    case 'primary':
-      return designTokens.color.actionPrimary;
-    case 'disabled':
-      return designTokens.color.actionDisabled;
-    case 'success':
-      return designTokens.color.successText;
-    case 'outline':
-      return 'transparent';
-    case 'reserved':
-      return designTokens.color.successText;
-    case 'destructive':
-      return designTokens.color.destructiveSurface;
-  }
+  return variantBackgrounds.get(variant) ?? designTokens.color.actionPrimary;
 }
 
 function variantTextColor(variant: PillVariant): string {
-  switch (variant) {
-    case 'primary':
-    case 'disabled':
-      return '#FFFFFF';
-    case 'success':
-    case 'reserved':
-      return designTokens.color.successSurface;
-    case 'outline':
-      return designTokens.color.textPrimary;
-    case 'destructive':
-      return designTokens.color.destructiveText;
-  }
+  return variantTextColors.get(variant) ?? '#FFFFFF';
 }
 
 function variantBorder(variant: PillVariant): string | undefined {
-  if (variant === 'outline') return designTokens.color.textPrimary;
-  return undefined;
+  return variantBorders.get(variant);
 }
 
 export function Pill({
