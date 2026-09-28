@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { designTokens } from '../../shared/ui/tokens';
+import type { BottomTabBarProps } from 'expo-router/tabs';
+import { designTokens } from '../../../../shared/ui/tokens';
 import { BarbellIcon, ClipboardIcon } from './TabBarIcons';
 
 interface TabConfig {
@@ -11,8 +11,8 @@ interface TabConfig {
 }
 
 const TAB_CONFIG: readonly TabConfig[] = [
-  { routeName: 'Clases', label: 'Clases', Icon: BarbellIcon },
-  { routeName: 'Mis reservas', label: 'Mis reservas', Icon: ClipboardIcon },
+  { routeName: '(proximas)', label: 'Clases', Icon: BarbellIcon },
+  { routeName: '(reservas)', label: 'Mis reservas', Icon: ClipboardIcon },
 ];
 
 const ACTIVE_COLOR = '#FFFFFF';

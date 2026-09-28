@@ -1,5 +1,5 @@
 import { StyleSheet, View, type ViewStyle } from 'react-native';
-import { designTokens } from '../../shared/ui/tokens';
+import { designTokens } from '../../../../shared/ui/tokens';
 
 export interface TabIconProps {
   readonly color: string;
