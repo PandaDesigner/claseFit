@@ -1,0 +1,12 @@
+name: Develop Builds
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  build:
+    type: build
+    params:
+      profile: development
+      platform: ALL
+      message: ${{ github.event.head_commit.message }}

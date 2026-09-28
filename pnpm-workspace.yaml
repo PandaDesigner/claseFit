@@ -1,0 +1,7 @@
+# pnpm 11 moved build-script approvals out of the `pnpm` field in
+# package.json. The new home is `allowBuilds` in this file. Without
+# it, `pnpm install --frozen-lockfile` exits non-zero in CI when a
+# transitive dep needs a postinstall (here: `unrs-resolver@1.12.2`,
+# required by expo@57 / Metro for its native ESM-resolver binding).
+allowBuilds:
+  unrs-resolver: true

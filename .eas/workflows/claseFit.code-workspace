@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../clasefit-planning-es"
+		}
+	],
+	"settings": {
+		"triggerTaskOnSave.tasks": {
+			"sweetpad: build": [
+				"**/*.swift"
+			]
+		},
+		"triggerTaskOnSave.on": true,
+		"triggerTaskOnSave.showNotifications": false,
+		"triggerTaskOnSave.restart": true,
+		"triggerTaskOnSave.delay": 1000,
+		"triggerTaskOnSave.resultIndicatorResetTimeout": 5,
+		"workbench.colorCustomizations": {}
+	}
+}

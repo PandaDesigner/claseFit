@@ -97,8 +97,9 @@ context: |
   # ───────────────────────────────────────────────────────────────────────
   # TDD: RED → GREEN → REFACTOR per task.
   # ───────────────────────────────────────────────────────────────────────
-  Every new behavior: write red test → implement minimum → refactor.
-  Do not mark a task complete without the visible cycle in commits.
+  Every new behavior: write and RUN a red test → implement minimum → refactor.
+  The test must fail for the expected missing behavior before production code.
+  Do not mark a task complete without the visible RED → GREEN → REFACTOR cycle.
   Domain and application tests run without React, Zustand, or device storage.
 
   # ───────────────────────────────────────────────────────────────────────
@@ -145,55 +146,41 @@ context: |
   FORBIDDEN "Co-Authored-By:" or any AI attribution in commits.
   One commit per closed task or reviewable logical batch.
 
+  # Execution, verification, and archive policy.
+  Do not implement a task without its red test when applicable.
+  Components do NOT contain business logic — presentation only.
+  Run real tests, types, lint, and OpenSpec validation; save real CLI output.
+  If a scenario fails, return to its task; do NOT archive.
+  Archive only after successful and complete verification, preserving traceability.
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Per-artifact rules.
 # ─────────────────────────────────────────────────────────────────────────────
 rules:
   proposal:
-    - Required sections: Why, What Changes, Impact.
-    - Include Non-goals — what is NOT done in this change.
-    - Keep under 500 words; link PRD/RFC instead of copying.
-    - One screen is NOT an independent bounded context.
+    - 'Required sections: Why, What Changes, Impact.'
+    - 'Include Non-goals — what is NOT done in this change.'
+    - 'Keep under 500 words; link PRD/RFC instead of copying.'
+    - 'One screen is NOT an independent bounded context.'
 
   specs:
-    - MUST/SHALL syntax and Given/When/Then scenarios required.
-    - Separate business requirements from UI details.
-    - Each requirement with at least one success and one rejection scenario.
-    - Functional messages literal from PRD §4 — quote as-is.
-    - Traceability: each requirement links to PRD, RN, or FR.
+    - 'MUST/SHALL syntax and Given/When/Then scenarios required.'
+    - 'Separate business requirements from UI details.'
+    - 'Each requirement with at least one success and one rejection scenario.'
+    - 'Functional messages literal from PRD §4 — quote as-is.'
+    - 'Traceability: each requirement links to PRD, RN, or FR.'
 
   design:
-    - Document decisions, ports, layer boundaries, alternatives, and risks.
-    - List concrete files to be created or modified (folder/file.ext).
-    - List affected ports (contracts in application/ports and adapters in infrastructure/).
-    - Indicate TDD cycle per task: which red test will be written first.
-    - Link PRD/RFC; do not duplicate content.
+    - 'Document decisions, ports, layer boundaries, alternatives, and risks.'
+    - 'List concrete files to be created or modified (folder/file.ext).'
+    - 'List affected ports (contracts in application/ports and adapters in infrastructure/).'
+    - 'Indicate TDD cycle per task: which red test will be written first.'
+    - 'Link PRD/RFC; do not duplicate content.'
 
   tasks:
-    - Each behavior follows RED → GREEN → REFACTOR before being marked complete.
-    - Concrete file paths; never vague descriptions.
-    - Each task references at least one spec scenario.
-    - Small tasks, independently verifiable.
-    - Suggested order: domain → use cases → adapters → UI → verification.
-    - Suggested limit: ≤ 2 hours of work per task.
-
-  apply:
-    - Do not implement a task without its red test when applicable.
-    - Conventional Commits; "Co-Authored-By" forbidden.
-    - Do not create re-exporting barrel/index.ts in src/ or shared/ui/.
-    - Changing an adapter touches ONLY the adapter + composition.ts.
-    - Components do NOT contain business logic — presentation only.
-    - Use Compound Components when applicable (see context).
-
-  verify:
-    - Run real tests, types, lint, and OpenSpec validation.
-    - Save real CLI output — do not fabricate.
-    - Reconcile evidence with tasks and scenarios one by one.
-    - If a scenario fails → return to its task; do NOT archive.
-    - Visual verification on iOS and Android when applicable to UI.
-
-  archive:
-    - Only archive after successful and complete verify.
-    - Archive does NOT remove traceability: the change is recorded.
-    - Document external blockers explicitly.
-    - Confirm that the current spec reflects the implemented reality.
+    - 'Each behavior follows RED → GREEN → REFACTOR before being marked complete.'
+    - 'Concrete file paths; never vague descriptions.'
+    - 'Each task references at least one spec scenario.'
+    - 'Small tasks, independently verifiable.'
+    - 'Suggested order: domain → use cases → adapters → UI → verification.'
+    - 'Suggested limit: ≤ 2 hours of work per task.'
